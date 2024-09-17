@@ -1,5 +1,8 @@
 gdb-test.c
 
+testbuild
+normalbuild
+
 
 *.vscode
 
