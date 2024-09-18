@@ -6,6 +6,8 @@
 
 #include "hash_table.h"
 
+#define HASH_TABLE_SIZE ((int)17)
+
 typedef struct entry entry_t;
 
 struct entry
@@ -17,7 +19,7 @@ struct entry
 
 struct hash_table
 {
-  entry_t buckets[17];
+  entry_t buckets[HASH_TABLE_SIZE];
 };
 
 ioopm_hash_table_t *ioopm_hash_table_create(void)
@@ -35,7 +37,7 @@ void ioopm_hash_table_destroy(ioopm_hash_table_t *ht)
   entry_t *current = NULL;
   entry_t *next = NULL;
 
-  for (int i = 0; i < 17; i++)
+  for (int i = 0; i < HASH_TABLE_SIZE; i++)
   {
     current = &ht->buckets[i];
     next = current->next;
@@ -89,7 +91,7 @@ static entry_t *find_previous_entry_for_key(entry_t *bucket, int key)
 void ioopm_hash_table_insert(ioopm_hash_table_t *ht, int key, char *value)
 {
   /// Calculate the bucket for this entry
-  int bucket = key % 17;
+  int bucket = key % HASH_TABLE_SIZE;
   /// Search for an existing entry for a key
   entry_t *entry = find_previous_entry_for_key(&ht->buckets[bucket], key);
   entry_t *next = entry->next;
@@ -112,7 +114,7 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, int key, char **result)
     return false;
   }
 
-  int ht_index = key % 17;
+  int ht_index = key % HASH_TABLE_SIZE;
   entry_t *prev_entry_ptr = find_previous_entry_for_key(&ht->buckets[ht_index], key);
 
   if (prev_entry_ptr->next == NULL)
@@ -128,7 +130,7 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, int key, char **result)
 
 bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, int key)
 {
-  int bucket = key % 17;
+  int bucket = key % HASH_TABLE_SIZE;
   entry_t *prev_entry_ptr = find_previous_entry_for_key(&ht->buckets[bucket], key);
   entry_t *to_be_removed = prev_entry_ptr->next;
 
