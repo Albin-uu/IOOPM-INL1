@@ -24,8 +24,38 @@ ioopm_hash_table_t *ioopm_hash_table_create(void)
   return calloc(1, sizeof(ioopm_hash_table_t));
 }
 
+static void entry_destroy(entry_t * entry_ptr)
+{
+  free(entry_ptr);
+}
+
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht)
 {
+  entry_t *current = NULL;
+  entry_t *next = NULL;
+
+  for (int i = 0; i < 17; i++)
+  {
+    current = &ht->buckets[i];
+    next = current->next;
+    
+    if (next == NULL)
+    {
+      continue;
+    }
+    else
+    {
+      // Skip trying to deallocate the sentinel.
+      do
+      {
+        current = next;
+        next = current->next;
+        entry_destroy(current);
+      }
+      while (next != NULL);
+    }
+  }
+
   free(ht);
 }
 
