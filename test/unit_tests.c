@@ -67,7 +67,7 @@ void test_remove()
 
 
   char *temp = NULL;
-  ioopm_hash_table_insert(ht,4, "testvalue");
+  ioopm_hash_table_insert(ht, 4, "testvalue");
   CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, 4, &temp));
 
   bool success2 = ioopm_hash_table_remove(ht, 4);

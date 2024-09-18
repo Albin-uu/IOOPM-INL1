@@ -21,7 +21,7 @@ void ioopm_hash_table_destroy(ioopm_hash_table_t *ht);
 
 /// @brief add key => value entry in hash table ht
 /// @param ht hash table operated upon
-/// @param key key to insert
+/// @param key key >= 0, to insert
 /// @param value value to insert
 void ioopm_hash_table_insert(ioopm_hash_table_t *ht, int key, char *value);
 
