@@ -1,5 +1,6 @@
 #include <CUnit/Basic.h>
 #include <CUnit/CUnit.h>
+#include <stdbool.h>
 #include "../src/hash_table.h"
 
 int init_suite(void) {
@@ -26,14 +27,32 @@ void test_create_destroy()
 void test_insert_once() {
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
 
-  char *lookup1 = ioopm_hash_table_lookup(ht, 5);
-  CU_ASSERT_PTR_NULL(lookup1);
+  char *value1 = NULL;
+  bool success1 = ioopm_hash_table_lookup(ht, 5, &value1);
+  CU_ASSERT_FALSE(success1);
+  CU_ASSERT_PTR_NULL(value1);
 
   ioopm_hash_table_insert(ht, 5, "test1");
-  char *lookup2 = ioopm_hash_table_lookup(ht, 5);
-  char *compare_to = "test1";
-  //CU_ASSERT_STRING_EQUAL(lookup2, compare_to);
-  CU_ASSERT_PTR_NULL(lookup2);
+  char *value2 = NULL;
+  bool success2 = ioopm_hash_table_lookup(ht, 5, &value2);
+  CU_ASSERT_TRUE(success2);
+  CU_ASSERT_STRING_EQUAL(value2, "test1");
+
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_lookup_empty()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  for (int i = 0; i < 18; ++i) /// 18 is a bit magical
+    {
+      char *result = NULL;
+      CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, i, &result));
+      CU_ASSERT_PTR_NULL(result);
+    }
+  char *negative_result = NULL;
+  CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, -1, &negative_result));
+  CU_ASSERT_PTR_NULL(negative_result);
 
   ioopm_hash_table_destroy(ht);
 }
@@ -60,6 +79,7 @@ int main() {
   if (
     (CU_add_test(my_test_suite, "create destroy", test_create_destroy) == NULL) ||
     (CU_add_test(my_test_suite, "insert once", test_insert_once) == NULL) ||
+    (CU_add_test(my_test_suite, "lookup empty", test_lookup_empty) == NULL) ||
     0
   )
     {
