@@ -1,4 +1,5 @@
 #include <CUnit/Basic.h>
+#include <CUnit/CUnit.h>
 #include "../src/hash_table.h"
 
 int init_suite(void) {
@@ -22,8 +23,19 @@ void test_create_destroy()
    ioopm_hash_table_destroy(ht);
 }
 
-void test2(void) {
-  CU_ASSERT_EQUAL(1 + 1, 2);
+void test_insert_once() {
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  char *lookup1 = ioopm_hash_table_lookup(ht, 5);
+  CU_ASSERT_PTR_NULL(lookup1);
+
+  ioopm_hash_table_insert(ht, 5, "test1");
+  char *lookup2 = ioopm_hash_table_lookup(ht, 5);
+  char *compare_to = "test1";
+  //CU_ASSERT_STRING_EQUAL(lookup2, compare_to);
+  CU_ASSERT_PTR_NULL(lookup2);
+
+  ioopm_hash_table_destroy(ht);
 }
 
 int main() {
@@ -47,7 +59,7 @@ int main() {
   // copy a line below and change the information
   if (
     (CU_add_test(my_test_suite, "create destroy", test_create_destroy) == NULL) ||
-    (CU_add_test(my_test_suite, "Basic arithmetics", test2) == NULL) ||
+    (CU_add_test(my_test_suite, "insert once", test_insert_once) == NULL) ||
     0
   )
     {
