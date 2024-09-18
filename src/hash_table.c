@@ -15,7 +15,7 @@ struct entry
 
 struct hash_table
 {
-  entry_t *buckets[17];
+  entry_t buckets[17];
 };
 
 ioopm_hash_table_t *ioopm_hash_table_create(void) {
