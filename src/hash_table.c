@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdbool.h>
+#include <assert.h>
 
 #include "hash_table.h"
 
@@ -90,9 +91,11 @@ static entry_t *find_previous_entry_for_key(entry_t *bucket, int key)
 
 void ioopm_hash_table_insert(ioopm_hash_table_t *ht, int key, char *value)
 {
-  /// Calculate the bucket for this entry
+  // Make sure key is not negative.
+  assert(key >= 0);
+
   int bucket = key % HASH_TABLE_SIZE;
-  /// Search for an existing entry for a key
+
   entry_t *entry = find_previous_entry_for_key(&ht->buckets[bucket], key);
   entry_t *next = entry->next;
 
