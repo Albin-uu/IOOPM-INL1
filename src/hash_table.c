@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <stdbool.h>
 
 #include "hash_table.h"
 
@@ -82,7 +83,6 @@ static entry_t *find_previous_entry_for_key(entry_t *bucket, int key)
     
     last_checked = last_checked->next;
   }
-  
   return last_checked;
 }
 
@@ -105,7 +105,23 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, int key, char *value)
     }
 }
 
-char *ioopm_hash_table_lookup(ioopm_hash_table_t *ht, int key)
+bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, int key, char **result)
 {
-  return NULL;
+  if (key < 0)
+  {
+    return false;
+  }
+
+  int ht_index = key % 17;
+  entry_t *prev_entry_ptr = find_previous_entry_for_key(&ht->buckets[ht_index], key);
+
+  if (prev_entry_ptr->next == NULL)
+  {
+    return false;
+  }
+  else
+  {
+    *result = prev_entry_ptr->next->value;
+    return true;
+  }
 }
