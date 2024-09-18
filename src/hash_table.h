@@ -28,11 +28,13 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, int key, char *value);
 /// @brief lookup value for key in hash table ht
 /// @param ht hash table operated upon
 /// @param key key to lookup
-/// @return the value mapped to by key (FIXME: incomplete)
-char *ioopm_hash_table_lookup(ioopm_hash_table_t *ht, int key);
+/// @param result pointer to string that will contain looked up value on success
+/// @return bool denoting if lookup succeeded
+/// Return value need to be checked before accessing result.
+bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, int key, char **result);
 
 /// @brief remove any mapping from key to a value
 /// @param ht hash table operated upon
 /// @param key key to remove
-/// @return the value mapped to by key (FIXME: incomplete)
-char *ioopm_hash_table_remove(ioopm_hash_table_t *ht, int key);
+/// @return bool denoting if removal succeeded
+bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, int key);
