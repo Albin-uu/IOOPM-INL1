@@ -125,3 +125,23 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, int key, char **result)
     return true;
   }
 }
+
+bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, int key)
+{
+  int bucket = key % 17;
+  entry_t *prev_entry_ptr = find_previous_entry_for_key(&ht->buckets[bucket], key);
+  entry_t *to_be_removed = prev_entry_ptr->next;
+
+  if (to_be_removed == NULL)
+  {
+    return false;
+  }
+  else
+  {
+    entry_t *final_next = to_be_removed->next;
+    prev_entry_ptr->next = final_next;
+
+    free(to_be_removed);
+    return true;
+  }
+}
