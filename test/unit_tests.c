@@ -213,6 +213,37 @@ void test_values()
   ioopm_hash_table_destroy(ht);
 }
 
+void test_keys_values_match()
+{
+  int keys[5] = {3, 10, 42, 0, 99};
+  char *values[5] = {"three", "ten", "fortytwo", "zero", "ninetynine"};
+
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  for (int i = 0; i < 5; i++)
+  {
+    ioopm_hash_table_insert(ht, keys[i], values[i]);
+  }
+
+  int *gotten_keys = ioopm_hash_table_keys(ht);
+  char **gotten_values = ioopm_hash_table_values(ht);
+  for (int i = 0; i < 5; i++)
+  {
+    for (int j = 0; j < 5; j++)
+    {
+      if (gotten_keys[i] == keys[j])
+      {
+        CU_ASSERT_STRING_EQUAL(gotten_values[i], values[j]);
+        break;
+      }
+    }
+  }
+
+  Free(gotten_keys);
+  Free(gotten_values);
+  ioopm_hash_table_destroy(ht);
+}
+
 int main() {
   // First we try to set up CUnit, and exit if we fail
   if (CU_initialize_registry() != CUE_SUCCESS)
@@ -242,6 +273,7 @@ int main() {
     (CU_add_test(hash_table_suite, "clear", test_clear) == NULL) ||
     (CU_add_test(hash_table_suite, "keys", test_keys) == NULL) ||
     (CU_add_test(hash_table_suite, "values", test_values) == NULL) ||
+    (CU_add_test(hash_table_suite, "keys values index match", test_keys_values_match) == NULL) ||
     0
   )
     {
