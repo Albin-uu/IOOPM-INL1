@@ -112,6 +112,25 @@ void test_empty()
   ioopm_hash_table_destroy(ht_nonempty);
 }
 
+void test_clear()
+{
+  ioopm_hash_table_t *ht_already_empty = ioopm_hash_table_create();
+  ioopm_hash_table_clear(ht_already_empty);
+  CU_ASSERT_TRUE(ioopm_hash_table_is_empty(ht_already_empty));
+  ioopm_hash_table_destroy(ht_already_empty);
+
+
+  ioopm_hash_table_t *ht_nonempty = ioopm_hash_table_create();
+  ioopm_hash_table_insert(ht_nonempty, 2, "val1");
+  ioopm_hash_table_insert(ht_nonempty, 432, "val2");
+  ioopm_hash_table_insert(ht_nonempty, 52, "val3");
+
+  ioopm_hash_table_clear(ht_nonempty);
+  CU_ASSERT_TRUE(ioopm_hash_table_is_empty(ht_nonempty));
+
+  ioopm_hash_table_destroy(ht_nonempty);
+}
+
 int main() {
   // First we try to set up CUnit, and exit if we fail
   if (CU_initialize_registry() != CUE_SUCCESS)
@@ -138,6 +157,7 @@ int main() {
     (CU_add_test(my_test_suite, "remove", test_remove) == NULL) ||
     (CU_add_test(my_test_suite, "size", test_size) == NULL) ||
     (CU_add_test(my_test_suite, "empty", test_empty) == NULL) ||
+    (CU_add_test(my_test_suite, "clear", test_clear) == NULL) ||
     0
   )
     {
