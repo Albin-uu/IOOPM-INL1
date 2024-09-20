@@ -38,30 +38,7 @@ static void entry_destroy(entry_t * entry_ptr)
 
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht)
 {
-  entry_t *current = NULL;
-  entry_t *next = NULL;
-
-  for (int i = 0; i < HASH_TABLE_SIZE; i++)
-  {
-    current = &ht->buckets[i];
-    next = current->next;
-    
-    if (next == NULL)
-    {
-      continue;
-    }
-    else
-    {
-      // Skip trying to deallocate the sentinel.
-      do
-      {
-        current = next;
-        next = current->next;
-        entry_destroy(current);
-      }
-      while (next != NULL);
-    }
-  }
+  ioopm_hash_table_clear(ht);
 
   free(ht);
 }
@@ -149,7 +126,6 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, int key)
   {
     entry_t *final_next = to_be_removed->next;
     prev_entry_ptr->next = final_next;
-
     free(to_be_removed);
 
     ht->size -= 1;
