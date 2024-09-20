@@ -77,6 +77,27 @@ void test_remove()
   ioopm_hash_table_destroy(ht);
 }
 
+void test_size()
+{
+  ioopm_hash_table_t *ht_empty = ioopm_hash_table_create();
+  CU_ASSERT_EQUAL(ioopm_hash_table_size(ht_empty), 0);
+  ioopm_hash_table_destroy(ht_empty);
+
+  ioopm_hash_table_t *ht_single = ioopm_hash_table_create();
+  ioopm_hash_table_insert(ht_single, 2, "somevalue");
+  CU_ASSERT_EQUAL(ioopm_hash_table_size(ht_single), 1);
+  ioopm_hash_table_destroy(ht_single);
+
+  ioopm_hash_table_t *ht_multi = ioopm_hash_table_create();
+  ioopm_hash_table_insert(ht_multi, 5, "value1");
+  ioopm_hash_table_insert(ht_multi, 2455, "value2");
+  ioopm_hash_table_insert(ht_multi, 51, "value3");
+  ioopm_hash_table_insert(ht_multi, 3, "value4");
+  ioopm_hash_table_insert(ht_multi, 81, "value5");
+  CU_ASSERT_EQUAL(ioopm_hash_table_size(ht_multi), 5);
+  ioopm_hash_table_destroy(ht_multi);
+}
+
 int main() {
   // First we try to set up CUnit, and exit if we fail
   if (CU_initialize_registry() != CUE_SUCCESS)
@@ -101,6 +122,7 @@ int main() {
     (CU_add_test(my_test_suite, "insert once, lookup", test_insert_once) == NULL) ||
     (CU_add_test(my_test_suite, "lookup empty", test_lookup_empty) == NULL) ||
     (CU_add_test(my_test_suite, "remove", test_remove) == NULL) ||
+    (CU_add_test(my_test_suite, "size", test_size) == NULL) ||
     0
   )
     {
