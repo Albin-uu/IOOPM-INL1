@@ -1,7 +1,11 @@
 #include <CUnit/Basic.h>
 #include <CUnit/CUnit.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include "../src/hash_table.h"
+
+#define Free(ptr) {free(ptr); ptr = NULL; }
 
 int init_suite(void) {
   // Change this function if you want to do something *before* you
@@ -131,6 +135,115 @@ void test_clear()
   ioopm_hash_table_destroy(ht_nonempty);
 }
 
+void test_keys()
+{
+  int keys[5] = {5, 0, 22, 511, 32};
+  bool found[5] = { false };
+
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  char *temp = "somevalue";
+  for (int i = 0; i < 5; i++)
+  {
+    ioopm_hash_table_insert(ht, keys[i], temp);
+  }
+
+  int *gotten_keys = ioopm_hash_table_keys(ht);
+  bool found_in_keys = false;
+
+  for (int i = 0; i < 5; i++)
+  {
+    found_in_keys = false;
+
+    for (int j = 0; j < 5; j++)
+    {
+      if (gotten_keys[i] == keys[j])
+      {
+        found[j] = true;
+        found_in_keys = true;
+        break;
+      }
+    }
+
+    if (!found_in_keys) { CU_FAIL("Found a key that was never inserted!"); }
+  }
+
+  // Validate that all keys were found.
+  for (int i = 0; i < 5; i++) { CU_ASSERT_TRUE(found[i]); }
+
+  Free(gotten_keys);
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_values()
+{
+  char *values[5] = {"val1", "val2", "val3", "val4", "val5"};
+  int keys[5] = {5, 0, 22, 511, 32};
+  bool found[5] = { false };
+
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  for (int i = 0; i < 5; i++)
+  {
+    ioopm_hash_table_insert(ht, keys[i], values[i]);
+  }
+
+  char **gotten_values = ioopm_hash_table_values(ht);
+  bool found_in_values = false;
+  for (int i = 0; i < 5; i++)
+  {
+    found_in_values = false;
+    for (int j = 0; j < 5; j++)
+    {
+      if (gotten_values[i] == values[j])
+      {
+        found[j] = true;
+        found_in_values = true;
+        break;
+      }
+    }
+
+    if (!found_in_values) { CU_FAIL("Found a key that was never inserted!"); }
+  }
+
+  // Validate that all keys were found.
+  for (int i = 0; i < 5; i++) { CU_ASSERT_TRUE(found[i]); }
+
+  Free(gotten_values);
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_keys_values_match()
+{
+  int keys[5] = {3, 10, 42, 0, 99};
+  char *values[5] = {"three", "ten", "fortytwo", "zero", "ninetynine"};
+
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  for (int i = 0; i < 5; i++)
+  {
+    ioopm_hash_table_insert(ht, keys[i], values[i]);
+  }
+
+  int *gotten_keys = ioopm_hash_table_keys(ht);
+  char **gotten_values = ioopm_hash_table_values(ht);
+  for (int i = 0; i < 5; i++)
+  {
+    for (int j = 0; j < 5; j++)
+    {
+      if (gotten_keys[i] == keys[j])
+      {
+        CU_ASSERT_STRING_EQUAL(gotten_values[i], values[j]);
+        break;
+      }
+    }
+  }
+
+  Free(gotten_keys);
+  Free(gotten_values);
+  ioopm_hash_table_destroy(ht);
+}
+
 int main() {
   // First we try to set up CUnit, and exit if we fail
   if (CU_initialize_registry() != CUE_SUCCESS)
@@ -138,8 +251,8 @@ int main() {
 
   // We then create an empty test suite and specify the name and
   // the init and cleanup functions
-  CU_pSuite my_test_suite = CU_add_suite("Hash table", init_suite, clean_suite);
-  if (my_test_suite == NULL) {
+  CU_pSuite hash_table_suite = CU_add_suite("Hash table", init_suite, clean_suite);
+  if (hash_table_suite == NULL) {
       // If the test suite could not be added, tear down CUnit and exit
       CU_cleanup_registry();
       return CU_get_error();
@@ -151,13 +264,16 @@ int main() {
   // the test in question. If you want to add another test, just
   // copy a line below and change the information
   if (
-    (CU_add_test(my_test_suite, "create destroy", test_create_destroy) == NULL) ||
-    (CU_add_test(my_test_suite, "insert once, lookup", test_insert_once) == NULL) ||
-    (CU_add_test(my_test_suite, "lookup empty", test_lookup_empty) == NULL) ||
-    (CU_add_test(my_test_suite, "remove", test_remove) == NULL) ||
-    (CU_add_test(my_test_suite, "size", test_size) == NULL) ||
-    (CU_add_test(my_test_suite, "empty", test_empty) == NULL) ||
-    (CU_add_test(my_test_suite, "clear", test_clear) == NULL) ||
+    (CU_add_test(hash_table_suite, "create destroy", test_create_destroy) == NULL) ||
+    (CU_add_test(hash_table_suite, "insert once, lookup", test_insert_once) == NULL) ||
+    (CU_add_test(hash_table_suite, "lookup empty", test_lookup_empty) == NULL) ||
+    (CU_add_test(hash_table_suite, "remove", test_remove) == NULL) ||
+    (CU_add_test(hash_table_suite, "size", test_size) == NULL) ||
+    (CU_add_test(hash_table_suite, "empty", test_empty) == NULL) ||
+    (CU_add_test(hash_table_suite, "clear", test_clear) == NULL) ||
+    (CU_add_test(hash_table_suite, "keys", test_keys) == NULL) ||
+    (CU_add_test(hash_table_suite, "values", test_values) == NULL) ||
+    (CU_add_test(hash_table_suite, "keys values index match", test_keys_values_match) == NULL) ||
     0
   )
     {

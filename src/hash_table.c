@@ -145,15 +145,17 @@ bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht)
 
 void ioopm_hash_table_clear(ioopm_hash_table_t *ht)
 {
-  entry_t *current = NULL;
-  entry_t *next = NULL;
+  entry_t *sentinel = NULL;
+  entry_t *current_entry = NULL;
+  entry_t *next_entry = NULL;
 
   for (int i = 0; i < HASH_TABLE_SIZE; i++)
   {
-    current = &ht->buckets[i];
-    next = current->next;
+    sentinel = &ht->buckets[i];
+    current_entry = sentinel;
+    next_entry = current_entry->next;
     
-    if (next == NULL)
+    if (next_entry == NULL)
     {
       continue;
     }
@@ -162,13 +164,60 @@ void ioopm_hash_table_clear(ioopm_hash_table_t *ht)
       // Skip trying to deallocate the sentinel.
       do
       {
-        current = next;
-        next = current->next;
-        entry_destroy(current);
+        current_entry = next_entry;
+        next_entry = next_entry->next;
+        entry_destroy(current_entry);
       }
-      while (next != NULL);
+      while (next_entry != NULL);
     }
+
+    // Reset sentinel in case the hash table will be used further.
+    sentinel->next = NULL; 
   }
 
   ht->size = 0;
+}
+
+int *ioopm_hash_table_keys(ioopm_hash_table_t *ht)
+{
+  int *keys = calloc(ht->size, sizeof(int));
+  int key_counter = 0;
+
+  entry_t *buckets = ht->buckets;
+  entry_t *current = NULL;
+  for (int i = 0; i < HASH_TABLE_SIZE; i++)
+  {
+    current = buckets[i].next;
+    while (current != NULL)
+    {
+      keys[key_counter] = current->key;
+      key_counter++;
+
+      current = current->next;
+    }
+  }
+
+  return keys;
+}
+
+char **ioopm_hash_table_values(ioopm_hash_table_t *ht)
+{
+  char **values = calloc(ioopm_hash_table_size(ht), sizeof(char *));
+  int value_counter = 0;
+
+  entry_t *buckets = ht->buckets;
+  entry_t *current = NULL;
+  for (int i = 0; i < HASH_TABLE_SIZE; i++)
+  {
+    current = buckets[i].next;
+    while (current != NULL)
+    {
+      values[value_counter] = current->value;
+      value_counter++;
+
+      current = current->next;
+    }
+  }
+
+  return values;
 }
