@@ -21,11 +21,14 @@ struct entry
 struct hash_table
 {
   entry_t buckets[HASH_TABLE_SIZE];
+  int size;
 };
 
 ioopm_hash_table_t *ioopm_hash_table_create(void)
 {
-  return calloc(1, sizeof(ioopm_hash_table_t));
+  ioopm_hash_table_t *ht = calloc(1, sizeof(ioopm_hash_table_t));
+  ht->size = 0;
+  return ht;
 }
 
 static void entry_destroy(entry_t * entry_ptr)
@@ -107,6 +110,7 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, int key, char *value)
   else
     {
       entry->next = entry_create(key, value, next);
+      ht->size += 1;
     }
 }
 
@@ -147,6 +151,8 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, int key)
     prev_entry_ptr->next = final_next;
 
     free(to_be_removed);
+
+    ht->size -= 1;
     return true;
   }
 }
