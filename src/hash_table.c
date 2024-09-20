@@ -177,3 +177,26 @@ void ioopm_hash_table_clear(ioopm_hash_table_t *ht)
 
   ht->size = 0;
 }
+
+int *ioopm_hash_table_keys(ioopm_hash_table_t *ht)
+{
+  int *keys = calloc(ht->size, sizeof(int));
+  int key_counter = 0;
+
+  entry_t *buckets = ht->buckets;
+  entry_t *current = NULL;
+  for (int i = 0; i < HASH_TABLE_SIZE; i++)
+  {
+    current = buckets[i].next;
+    while (current != NULL)
+    {
+      keys[key_counter] = current->key;
+      key_counter++;
+
+      current = current->next;
+    }
+  }
+
+  return keys;
+}
+
