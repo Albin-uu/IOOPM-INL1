@@ -167,3 +167,32 @@ bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht)
   return ioopm_hash_table_size(ht) == 0;
 }
 
+void ioopm_hash_table_clear(ioopm_hash_table_t *ht)
+{
+  entry_t *current = NULL;
+  entry_t *next = NULL;
+
+  for (int i = 0; i < HASH_TABLE_SIZE; i++)
+  {
+    current = &ht->buckets[i];
+    next = current->next;
+    
+    if (next == NULL)
+    {
+      continue;
+    }
+    else
+    {
+      // Skip trying to deallocate the sentinel.
+      do
+      {
+        current = next;
+        next = current->next;
+        entry_destroy(current);
+      }
+      while (next != NULL);
+    }
+  }
+
+  ht->size = 0;
+}
