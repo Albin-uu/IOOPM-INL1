@@ -156,3 +156,9 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, int key)
     return true;
   }
 }
+
+int ioopm_hash_table_size(ioopm_hash_table_t *ht)
+{
+  return ht->size;
+}
+
