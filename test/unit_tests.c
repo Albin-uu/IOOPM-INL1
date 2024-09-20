@@ -175,6 +175,44 @@ void test_keys()
   ioopm_hash_table_destroy(ht);
 }
 
+void test_values()
+{
+  char *values[5] = {"val1", "val2", "val3", "val4", "val5"};
+  int keys[5] = {5, 0, 22, 511, 32};
+  bool found[5] = { false };
+
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  for (int i = 0; i < 5; i++)
+  {
+    ioopm_hash_table_insert(ht, keys[i], values[i]);
+  }
+
+  char **gotten_values = ioopm_hash_table_values(ht);
+  bool found_in_values = false;
+  for (int i = 0; i < 5; i++)
+  {
+    found_in_values = false;
+    for (int j = 0; j < 5; j++)
+    {
+      if (gotten_values[i] == values[j])
+      {
+        found[j] = true;
+        found_in_values = true;
+        break;
+      }
+    }
+
+    if (!found_in_values) { CU_FAIL("Found a key that was never inserted!"); }
+  }
+
+  // Validate that all keys were found.
+  for (int i = 0; i < 5; i++) { CU_ASSERT_TRUE(found[i]); }
+
+  Free(gotten_values);
+  ioopm_hash_table_destroy(ht);
+}
+
 int main() {
   // First we try to set up CUnit, and exit if we fail
   if (CU_initialize_registry() != CUE_SUCCESS)
@@ -203,6 +241,7 @@ int main() {
     (CU_add_test(hash_table_suite, "empty", test_empty) == NULL) ||
     (CU_add_test(hash_table_suite, "clear", test_clear) == NULL) ||
     (CU_add_test(hash_table_suite, "keys", test_keys) == NULL) ||
+    (CU_add_test(hash_table_suite, "values", test_values) == NULL) ||
     0
   )
     {
