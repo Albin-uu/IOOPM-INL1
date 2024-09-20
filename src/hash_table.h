@@ -38,3 +38,18 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, int key, char **result);
 /// @param key key to remove
 /// @return bool denoting if removal succeeded
 bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, int key);
+
+/// @brief returns the number of key => value entries in the hash table
+/// @param h hash table operated upon
+/// @return the number of key => value entries in the hash table
+int ioopm_hash_table_size(ioopm_hash_table_t *ht);
+
+/// @brief checks if the hash table is empty
+/// @param h hash table operated upon
+/// @return true is size == 0, else false
+bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht);
+
+/// @brief clear all the entries in a hash table
+/// @param h hash table operated upon
+void ioopm_hash_table_clear(ioopm_hash_table_t *ht);
+

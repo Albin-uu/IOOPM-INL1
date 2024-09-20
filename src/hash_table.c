@@ -21,11 +21,14 @@ struct entry
 struct hash_table
 {
   entry_t buckets[HASH_TABLE_SIZE];
+  int size;
 };
 
 ioopm_hash_table_t *ioopm_hash_table_create(void)
 {
-  return calloc(1, sizeof(ioopm_hash_table_t));
+  ioopm_hash_table_t *ht = calloc(1, sizeof(ioopm_hash_table_t));
+  ht->size = 0;
+  return ht;
 }
 
 static void entry_destroy(entry_t * entry_ptr)
@@ -35,30 +38,7 @@ static void entry_destroy(entry_t * entry_ptr)
 
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht)
 {
-  entry_t *current = NULL;
-  entry_t *next = NULL;
-
-  for (int i = 0; i < HASH_TABLE_SIZE; i++)
-  {
-    current = &ht->buckets[i];
-    next = current->next;
-    
-    if (next == NULL)
-    {
-      continue;
-    }
-    else
-    {
-      // Skip trying to deallocate the sentinel.
-      do
-      {
-        current = next;
-        next = current->next;
-        entry_destroy(current);
-      }
-      while (next != NULL);
-    }
-  }
+  ioopm_hash_table_clear(ht);
 
   free(ht);
 }
@@ -107,6 +87,7 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, int key, char *value)
   else
     {
       entry->next = entry_create(key, value, next);
+      ht->size += 1;
     }
 }
 
@@ -145,8 +126,49 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, int key)
   {
     entry_t *final_next = to_be_removed->next;
     prev_entry_ptr->next = final_next;
-
     free(to_be_removed);
+
+    ht->size -= 1;
     return true;
   }
+}
+
+int ioopm_hash_table_size(ioopm_hash_table_t *ht)
+{
+  return ht->size;
+}
+
+bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht)
+{
+  return ioopm_hash_table_size(ht) == 0;
+}
+
+void ioopm_hash_table_clear(ioopm_hash_table_t *ht)
+{
+  entry_t *current = NULL;
+  entry_t *next = NULL;
+
+  for (int i = 0; i < HASH_TABLE_SIZE; i++)
+  {
+    current = &ht->buckets[i];
+    next = current->next;
+    
+    if (next == NULL)
+    {
+      continue;
+    }
+    else
+    {
+      // Skip trying to deallocate the sentinel.
+      do
+      {
+        current = next;
+        next = current->next;
+        entry_destroy(current);
+      }
+      while (next != NULL);
+    }
+  }
+
+  ht->size = 0;
 }
