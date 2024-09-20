@@ -200,3 +200,24 @@ int *ioopm_hash_table_keys(ioopm_hash_table_t *ht)
   return keys;
 }
 
+char **ioopm_hash_table_values(ioopm_hash_table_t *ht)
+{
+  char **values = calloc(ioopm_hash_table_size(ht), sizeof(char *));
+  int value_counter = 0;
+
+  entry_t *buckets = ht->buckets;
+  entry_t *current = NULL;
+  for (int i = 0; i < HASH_TABLE_SIZE; i++)
+  {
+    current = buckets[i].next;
+    while (current != NULL)
+    {
+      values[value_counter] = current->value;
+      value_counter++;
+
+      current = current->next;
+    }
+  }
+
+  return values;
+}

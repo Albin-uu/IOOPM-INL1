@@ -59,3 +59,9 @@ void ioopm_hash_table_clear(ioopm_hash_table_t *ht);
 /// The array needs to be free'd after use.
 int *ioopm_hash_table_keys(ioopm_hash_table_t *ht);
 
+/// @brief return the values for all entries in a hash map (in no particular order, but same as ioopm_hash_table_keys)
+/// @param h hash table operated upon
+/// @return an array of values for hash table h
+/// The array needs to be free'd after use.
+char **ioopm_hash_table_values(ioopm_hash_table_t *ht);
+
