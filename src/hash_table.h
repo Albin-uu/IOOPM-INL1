@@ -11,6 +11,9 @@
 
 typedef struct hash_table ioopm_hash_table_t;
 
+typedef bool ioopm_predicate(int key, char *value, void *extra);
+typedef void ioopm_apply_function(const int key, char **value, void *extra);
+
 /// @brief Create a new hash table
 /// @return A new empty hash table
 ioopm_hash_table_t *ioopm_hash_table_create(void);
@@ -74,4 +77,10 @@ bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, int key);
 /// @param h hash table operated upon
 /// @param value the value sought
 bool ioopm_hash_table_has_value(ioopm_hash_table_t *ht, char *value);
+
+/// @brief check if a predicate is satisfied by all entries in a hash table
+/// @param h hash table operated upon
+/// @param pred the predicate
+/// @param arg extra argument to pred
+bool ioopm_hash_table_all(ioopm_hash_table_t *ht, ioopm_predicate *pred, void *arg);
 
