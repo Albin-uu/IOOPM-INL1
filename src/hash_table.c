@@ -228,3 +228,20 @@ bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, int key)
   return ioopm_hash_table_lookup(ht, key, &temp);
 }
 
+bool ioopm_hash_table_has_value(ioopm_hash_table_t *ht, char *value)
+{
+  char **ht_values = ioopm_hash_table_values(ht);
+
+  for (int i = 0; i < ht->size; i++)
+  {
+    // strcmp has weird return values, 0 means equal.
+    if (strcmp(ht_values[i], value) == 0)
+    {
+      free(ht_values);
+      return true;
+    }
+  }
+
+  free(ht_values);
+  return false;
+}
