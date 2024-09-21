@@ -222,12 +222,23 @@ char **ioopm_hash_table_values(ioopm_hash_table_t *ht)
   return values;
 }
 
+/*static bool key_equiv(int key, char *value_ignored, void *x)
+{
+  int *other_key_ptr = x;
+  int other_key = *other_key_ptr;
+  return key == other_key;
+}*/
+
+// Using ioopm_hash_table_any here would massively
+// degrade performance at minimal benefit.
 bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, int key)
 {
   char *temp = NULL;
   return ioopm_hash_table_lookup(ht, key, &temp);
 }
 
+// Using ioopm_hash_table_any here would
+// degrade performance at a small benefit and add coupling.
 bool ioopm_hash_table_has_value(ioopm_hash_table_t *ht, char *value)
 {
   char **ht_values = ioopm_hash_table_values(ht);
