@@ -283,6 +283,27 @@ void test_has_value()
   ioopm_hash_table_destroy(ht);
 }
 
+static bool matches_string(int key, char *value, char *match_for)
+{
+  return strcmp(value, match_for) == 0;
+}
+
+void test_valid_for_all()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  ioopm_hash_table_insert(ht, 42, "value to match");
+  ioopm_hash_table_insert(ht, 311, "value to match");
+  ioopm_hash_table_insert(ht, 8, "value to match");
+  ioopm_hash_table_insert(ht, 241, "other value");
+  CU_ASSERT_FALSE(ioopm_hash_table_all(ht, (ioopm_predicate *) matches_string, "value to match"));
+
+  ioopm_hash_table_remove(ht, 241);
+  CU_ASSERT_TRUE(ioopm_hash_table_all(ht, (ioopm_predicate *) matches_string, "value to match"));
+
+  ioopm_hash_table_destroy(ht);
+}
+
 int main() {
   // First we try to set up CUnit, and exit if we fail
   if (CU_initialize_registry() != CUE_SUCCESS)
@@ -315,6 +336,7 @@ int main() {
     (CU_add_test(hash_table_suite, "keys values index match", test_keys_values_match) == NULL) ||
     (CU_add_test(hash_table_suite, "has key", test_has_key) == NULL) ||
     (CU_add_test(hash_table_suite, "has value", test_has_value) == NULL) ||
+    (CU_add_test(hash_table_suite, "valid for all", test_valid_for_all) == NULL) ||
     0
   )
     {
