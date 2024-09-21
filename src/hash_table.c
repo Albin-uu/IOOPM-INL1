@@ -262,3 +262,20 @@ bool ioopm_hash_table_all(ioopm_hash_table_t *ht, ioopm_predicate *pred, void *a
 
   return result;
 }
+
+bool ioopm_hash_table_any(ioopm_hash_table_t *ht, ioopm_predicate *pred, void *arg)
+{
+  int size = ioopm_hash_table_size(ht);
+  int *keys = ioopm_hash_table_keys(ht);
+  char **values = ioopm_hash_table_values(ht);
+  bool result = false;
+  for (int i = 0; i < size && result == false; ++i)
+  {
+    result = pred(keys[i], values[i], arg);
+  }
+
+  free(keys);
+  free(values);
+
+  return result;
+}
