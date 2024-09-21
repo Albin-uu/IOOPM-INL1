@@ -29,11 +29,11 @@ void ioopm_hash_table_destroy(ioopm_hash_table_t *ht);
 void ioopm_hash_table_insert(ioopm_hash_table_t *ht, int key, char *value);
 
 /// @brief lookup value for key in hash table ht
+/// @brief return value need to be checked before accessing result.
 /// @param ht hash table operated upon
 /// @param key key to lookup
 /// @param result pointer to string that will contain looked up value on success
 /// @return bool denoting if lookup succeeded
-/// Return value need to be checked before accessing result.
 bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, int key, char **result);
 
 /// @brief remove any mapping from key to a value
@@ -57,15 +57,15 @@ bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht);
 void ioopm_hash_table_clear(ioopm_hash_table_t *ht);
 
 /// @brief return the keys for all entries in a hash map (in no particular order, but same as ioopm_hash_table_values)
+/// @brief the array needs to be free'd after use.
 /// @param h hash table operated upon
 /// @return an array of keys for hash table h
-/// The array needs to be free'd after use.
 int *ioopm_hash_table_keys(ioopm_hash_table_t *ht);
 
 /// @brief return the values for all entries in a hash map (in no particular order, but same as ioopm_hash_table_keys)
+/// @brief the array needs to be free'd after use.
 /// @param h hash table operated upon
 /// @return an array of values for hash table h
-/// The array needs to be free'd after use.
 char **ioopm_hash_table_values(ioopm_hash_table_t *ht);
 
 /// @brief check if a hash table has an entry with a given key
