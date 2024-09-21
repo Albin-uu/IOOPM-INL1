@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include "../src/hash_table.h"
 
 #define Free(ptr) {free(ptr); ptr = NULL; }
@@ -259,6 +260,29 @@ void test_has_key()
   ioopm_hash_table_destroy(ht);
 }
 
+void test_has_value()
+{
+  // Note C lang does not specify if two equal string literals are stored
+  // in the same place in memory. Need to check properly.
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  char char_arr[] = "char array";
+  char *literal1 = "literal";
+  // Remeber to free anything from strdup.
+  char *literal2 = strdup(literal1);
+ 
+  ioopm_hash_table_insert(ht, 42, literal1);
+  ioopm_hash_table_insert(ht, 5, char_arr);
+
+  CU_ASSERT_TRUE(ioopm_hash_table_has_value(ht, literal1));
+  CU_ASSERT_TRUE(ioopm_hash_table_has_value(ht, literal2));
+  CU_ASSERT_TRUE(ioopm_hash_table_has_value(ht, char_arr));
+
+  CU_ASSERT_FALSE(ioopm_hash_table_has_value(ht, "not inserted"));
+
+  Free(literal2);
+  ioopm_hash_table_destroy(ht);
+}
+
 int main() {
   // First we try to set up CUnit, and exit if we fail
   if (CU_initialize_registry() != CUE_SUCCESS)
@@ -290,6 +314,7 @@ int main() {
     (CU_add_test(hash_table_suite, "values", test_values) == NULL) ||
     (CU_add_test(hash_table_suite, "keys values index match", test_keys_values_match) == NULL) ||
     (CU_add_test(hash_table_suite, "has key", test_has_key) == NULL) ||
+    (CU_add_test(hash_table_suite, "has value", test_has_value) == NULL) ||
     0
   )
     {
