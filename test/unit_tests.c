@@ -319,6 +319,39 @@ void test_valid_for_any()
   ioopm_hash_table_destroy(ht);
 }
 
+typedef struct
+{
+  int count;
+  char *compare;
+} occur_struct;
+
+static void count_occurences(int key, char **value, void *arg)
+{
+  occur_struct *stc = arg;
+  if (strcmp(*value, stc->compare) == 0)
+  {
+    stc->count++;
+  }
+}
+
+void test_apply_all()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  
+  occur_struct occ_struct = { .count = 0, .compare = "comparevalue" };
+
+  ioopm_hash_table_insert(ht, 42, "comparevalue");
+  ioopm_hash_table_insert(ht, 12, "comparevalue");
+  ioopm_hash_table_insert(ht, 55, "other");
+  ioopm_hash_table_insert(ht, 822, "comparevalue");
+  ioopm_hash_table_insert(ht, 5, "something else");
+
+  ioopm_hash_table_apply_to_all(ht, (ioopm_apply_function *) count_occurences, &occ_struct);
+  CU_ASSERT_EQUAL(occ_struct.count, 3);
+
+  ioopm_hash_table_destroy(ht);
+}
+
 int main() {
   // First we try to set up CUnit, and exit if we fail
   if (CU_initialize_registry() != CUE_SUCCESS)
@@ -353,6 +386,7 @@ int main() {
     (CU_add_test(hash_table_suite, "has value", test_has_value) == NULL) ||
     (CU_add_test(hash_table_suite, "valid for all", test_valid_for_all) == NULL) ||
     (CU_add_test(hash_table_suite, "valid for any", test_valid_for_any) == NULL) ||
+    (CU_add_test(hash_table_suite, "apply all", test_apply_all) == NULL) ||
     0
   )
     {
