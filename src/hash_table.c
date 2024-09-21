@@ -279,3 +279,17 @@ bool ioopm_hash_table_any(ioopm_hash_table_t *ht, ioopm_predicate *pred, void *a
 
   return result;
 }
+
+void ioopm_hash_table_apply_to_all(ioopm_hash_table_t *ht, ioopm_apply_function *apply_fun, void *arg)
+{
+  int size = ioopm_hash_table_size(ht);
+  int *keys = ioopm_hash_table_keys(ht);
+  char **values = ioopm_hash_table_values(ht);
+  for (int i = 0; i < size; ++i)
+  {
+    apply_fun(keys[i], &values[i], arg);
+  }
+
+  free(keys);
+  free(values);
+}
