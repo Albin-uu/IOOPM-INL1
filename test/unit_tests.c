@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include "../src/hash_table.h"
 
 #define Free(ptr) {free(ptr); ptr = NULL; }
@@ -244,6 +245,113 @@ void test_keys_values_match()
   ioopm_hash_table_destroy(ht);
 }
 
+void test_has_key()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+ 
+  ioopm_hash_table_insert(ht, 42, "somevalue");
+  ioopm_hash_table_insert(ht, 525, "somevalue");
+
+  CU_ASSERT_TRUE(ioopm_hash_table_has_key(ht, 42));
+  CU_ASSERT_TRUE(ioopm_hash_table_has_key(ht, 525));
+
+  CU_ASSERT_FALSE(ioopm_hash_table_has_key(ht, 123));
+
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_has_value()
+{
+  // Note C lang does not specify if two equal string literals are stored
+  // in the same place in memory. Need to check properly.
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  char char_arr[] = "char array";
+  char *literal1 = "literal";
+  // Remeber to free anything from strdup.
+  char *literal2 = strdup(literal1);
+ 
+  ioopm_hash_table_insert(ht, 42, literal1);
+  ioopm_hash_table_insert(ht, 5, char_arr);
+
+  CU_ASSERT_TRUE(ioopm_hash_table_has_value(ht, literal1));
+  CU_ASSERT_TRUE(ioopm_hash_table_has_value(ht, literal2));
+  CU_ASSERT_TRUE(ioopm_hash_table_has_value(ht, char_arr));
+
+  CU_ASSERT_FALSE(ioopm_hash_table_has_value(ht, "not inserted"));
+
+  Free(literal2);
+  ioopm_hash_table_destroy(ht);
+}
+
+static bool matches_string(int key, char *value, char *match_for)
+{
+  return strcmp(value, match_for) == 0;
+}
+
+void test_valid_for_all()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  ioopm_hash_table_insert(ht, 42, "value to match");
+  ioopm_hash_table_insert(ht, 311, "value to match");
+  ioopm_hash_table_insert(ht, 8, "value to match");
+  ioopm_hash_table_insert(ht, 241, "other value");
+  CU_ASSERT_FALSE(ioopm_hash_table_all(ht, (ioopm_predicate *) matches_string, "value to match"));
+
+  ioopm_hash_table_remove(ht, 241);
+  CU_ASSERT_TRUE(ioopm_hash_table_all(ht, (ioopm_predicate *) matches_string, "value to match"));
+
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_valid_for_any()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  ioopm_hash_table_insert(ht, 42, "value1");
+  ioopm_hash_table_insert(ht, 311, "value2");
+  ioopm_hash_table_insert(ht, 8, "value3");
+  CU_ASSERT_FALSE(ioopm_hash_table_any(ht, (ioopm_predicate *) matches_string, "value to match"));
+
+  ioopm_hash_table_insert(ht, 241, "value to match");
+  CU_ASSERT_TRUE(ioopm_hash_table_any(ht, (ioopm_predicate *) matches_string, "value to match"));
+
+  ioopm_hash_table_destroy(ht);
+}
+
+typedef struct
+{
+  int count;
+  char *compare;
+} occur_struct;
+
+static void count_occurences(int key, char **value, void *arg)
+{
+  occur_struct *stc = arg;
+  if (strcmp(*value, stc->compare) == 0)
+  {
+    stc->count++;
+  }
+}
+
+void test_apply_all()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  
+  occur_struct occ_struct = { .count = 0, .compare = "comparevalue" };
+
+  ioopm_hash_table_insert(ht, 42, "comparevalue");
+  ioopm_hash_table_insert(ht, 12, "comparevalue");
+  ioopm_hash_table_insert(ht, 55, "other");
+  ioopm_hash_table_insert(ht, 822, "comparevalue");
+  ioopm_hash_table_insert(ht, 5, "something else");
+
+  ioopm_hash_table_apply_to_all(ht, (ioopm_apply_function *) count_occurences, &occ_struct);
+  CU_ASSERT_EQUAL(occ_struct.count, 3);
+
+  ioopm_hash_table_destroy(ht);
+}
+
 int main() {
   // First we try to set up CUnit, and exit if we fail
   if (CU_initialize_registry() != CUE_SUCCESS)
@@ -274,6 +382,11 @@ int main() {
     (CU_add_test(hash_table_suite, "keys", test_keys) == NULL) ||
     (CU_add_test(hash_table_suite, "values", test_values) == NULL) ||
     (CU_add_test(hash_table_suite, "keys values index match", test_keys_values_match) == NULL) ||
+    (CU_add_test(hash_table_suite, "has key", test_has_key) == NULL) ||
+    (CU_add_test(hash_table_suite, "has value", test_has_value) == NULL) ||
+    (CU_add_test(hash_table_suite, "valid for all", test_valid_for_all) == NULL) ||
+    (CU_add_test(hash_table_suite, "valid for any", test_valid_for_any) == NULL) ||
+    (CU_add_test(hash_table_suite, "apply all", test_apply_all) == NULL) ||
     0
   )
     {

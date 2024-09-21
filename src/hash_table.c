@@ -221,3 +221,86 @@ char **ioopm_hash_table_values(ioopm_hash_table_t *ht)
 
   return values;
 }
+
+/*static bool key_equiv(int key, char *value_ignored, void *x)
+{
+  int *other_key_ptr = x;
+  int other_key = *other_key_ptr;
+  return key == other_key;
+}*/
+
+// Using ioopm_hash_table_any here would massively
+// degrade performance at minimal benefit.
+bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, int key)
+{
+  char *temp = NULL;
+  return ioopm_hash_table_lookup(ht, key, &temp);
+}
+
+// Using ioopm_hash_table_any here would
+// degrade performance at a small benefit and add coupling.
+bool ioopm_hash_table_has_value(ioopm_hash_table_t *ht, char *value)
+{
+  char **ht_values = ioopm_hash_table_values(ht);
+
+  for (int i = 0; i < ht->size; i++)
+  {
+    // strcmp has weird return values, 0 means equal.
+    if (strcmp(ht_values[i], value) == 0)
+    {
+      free(ht_values);
+      return true;
+    }
+  }
+
+  free(ht_values);
+  return false;
+}
+
+bool ioopm_hash_table_all(ioopm_hash_table_t *ht, ioopm_predicate *pred, void *arg)
+{
+  int size = ioopm_hash_table_size(ht);
+  int *keys = ioopm_hash_table_keys(ht);
+  char **values = ioopm_hash_table_values(ht);
+  bool result = true;
+  for (int i = 0; i < size && result; ++i)
+  {
+    result = result && pred(keys[i], values[i], arg);
+  }
+
+  free(keys);
+  free(values);
+
+  return result;
+}
+
+bool ioopm_hash_table_any(ioopm_hash_table_t *ht, ioopm_predicate *pred, void *arg)
+{
+  int size = ioopm_hash_table_size(ht);
+  int *keys = ioopm_hash_table_keys(ht);
+  char **values = ioopm_hash_table_values(ht);
+  bool result = false;
+  for (int i = 0; i < size && result == false; ++i)
+  {
+    result = pred(keys[i], values[i], arg);
+  }
+
+  free(keys);
+  free(values);
+
+  return result;
+}
+
+void ioopm_hash_table_apply_to_all(ioopm_hash_table_t *ht, ioopm_apply_function *apply_fun, void *arg)
+{
+  int size = ioopm_hash_table_size(ht);
+  int *keys = ioopm_hash_table_keys(ht);
+  char **values = ioopm_hash_table_values(ht);
+  for (int i = 0; i < size; ++i)
+  {
+    apply_fun(keys[i], &values[i], arg);
+  }
+
+  free(keys);
+  free(values);
+}
