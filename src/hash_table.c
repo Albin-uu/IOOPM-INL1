@@ -221,3 +221,10 @@ char **ioopm_hash_table_values(ioopm_hash_table_t *ht)
 
   return values;
 }
+
+bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, int key)
+{
+  char *temp = NULL;
+  return ioopm_hash_table_lookup(ht, key, &temp);
+}
+

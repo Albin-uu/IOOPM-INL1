@@ -65,3 +65,8 @@ int *ioopm_hash_table_keys(ioopm_hash_table_t *ht);
 /// The array needs to be free'd after use.
 char **ioopm_hash_table_values(ioopm_hash_table_t *ht);
 
+/// @brief check if a hash table has an entry with a given key
+/// @param h hash table operated upon
+/// @param key the key sought
+bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, int key);
+
