@@ -90,3 +90,31 @@ void ioopm_linked_list_destroy(ioopm_list_t *list)
   free(list);
 }
 
+void ioopm_linked_list_prepend(ioopm_list_t *list, int value)
+{
+  list_link *current_first = first_proper_elem(list);
+  list_link *new_link = calloc(1, sizeof(list_link));
+
+  new_link->value = value;
+  new_link->next = current_first;
+
+  list_link *sentinel = get_sentinel(list);
+  sentinel->next = new_link;
+
+  size_increment(list);
+}
+
+void ioopm_linked_list_append(ioopm_list_t *list, int value)
+{
+  list_link *current_last = last_proper_elem(list);
+  list_link *new_link = calloc(1, sizeof(list_link));
+
+  new_link->value = value;
+  new_link->next = NULL;
+
+  current_last->next = new_link;
+  list->last = new_link;
+
+  size_increment(list);
+}
+

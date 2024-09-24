@@ -21,3 +21,13 @@ ioopm_list_t *ioopm_linked_list_create(void);
 /// @param list the list to be destroyed
 void ioopm_linked_list_destroy(ioopm_list_t *list);
 
+/// @brief Insert at the end of a linked list in O(1) time
+/// @param list the linked list that will be appended
+/// @param value the value to be appended
+void ioopm_linked_list_append(ioopm_list_t *list, int value);
+
+/// @brief Insert at the front of a linked list in O(1) time
+/// @param list the linked list that will be prepended to
+/// @param value the value to be prepended
+void ioopm_linked_list_prepend(ioopm_list_t *list, int value);
+
