@@ -444,6 +444,23 @@ void test_list_remove()
   ioopm_linked_list_destroy(lst);
 }
 
+void test_list_get()
+{
+  ioopm_list_t *lst = ioopm_linked_list_create();
+
+  ioopm_linked_list_append(lst, 100);
+  ioopm_linked_list_append(lst, 110);
+  ioopm_linked_list_append(lst, 120);
+  ioopm_linked_list_append(lst, 130);
+  ioopm_linked_list_append(lst, 140);
+
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0), 100);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2), 120);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 4), 140);
+
+  ioopm_linked_list_destroy(lst);
+}
+
 int main() {
   // First we try to set up CUnit, and exit if we fail
   if (CU_initialize_registry() != CUE_SUCCESS)
@@ -488,6 +505,7 @@ int main() {
     (CU_add_test(linked_list_suite, "append", test_list_append) == NULL) ||
     (CU_add_test(linked_list_suite, "insert", test_list_insert) == NULL) ||
     (CU_add_test(linked_list_suite, "remove", test_list_remove) == NULL) ||
+    (CU_add_test(linked_list_suite, "get", test_list_get) == NULL) ||
     0
   )
     {
