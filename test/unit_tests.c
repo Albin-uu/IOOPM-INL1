@@ -406,6 +406,44 @@ void test_list_append()
   ioopm_linked_list_destroy(lst);
 }
 
+void test_list_insert()
+{
+  ioopm_list_t *lst = ioopm_linked_list_create();
+
+  ioopm_linked_list_insert(lst, 0, 5);
+  ioopm_linked_list_insert(lst, 1, 10);
+  ioopm_linked_list_insert(lst, 1, 15);
+
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0), 5);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 1), 15);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2), 10);
+  CU_ASSERT_EQUAL(ioopm_linked_list_size(lst), 3);
+
+  ioopm_linked_list_destroy(lst);
+}
+
+void test_list_remove()
+{
+  ioopm_list_t *lst = ioopm_linked_list_create();
+
+  ioopm_linked_list_append(lst, 10);
+  ioopm_linked_list_append(lst, 20);
+  ioopm_linked_list_append(lst, 30);
+  ioopm_linked_list_append(lst, 40);
+
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2), 30);
+  CU_ASSERT_EQUAL(ioopm_linked_list_size(lst), 4);
+
+  CU_ASSERT_EQUAL(ioopm_linked_list_remove(lst, 2), 30);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2), 40);
+  CU_ASSERT_EQUAL(ioopm_linked_list_size(lst), 3);
+
+  CU_ASSERT_EQUAL(ioopm_linked_list_remove(lst, 0), 10);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0), 20);
+
+  ioopm_linked_list_destroy(lst);
+}
+
 int main() {
   // First we try to set up CUnit, and exit if we fail
   if (CU_initialize_registry() != CUE_SUCCESS)
@@ -448,6 +486,8 @@ int main() {
     (CU_add_test(linked_list_suite, "create destroy", test_list_create_destroy) == NULL) ||
     (CU_add_test(linked_list_suite, "prepend", test_list_prepend) == NULL) ||
     (CU_add_test(linked_list_suite, "append", test_list_append) == NULL) ||
+    (CU_add_test(linked_list_suite, "insert", test_list_insert) == NULL) ||
+    (CU_add_test(linked_list_suite, "remove", test_list_remove) == NULL) ||
     0
   )
     {
