@@ -160,3 +160,8 @@ int ioopm_linked_list_get(ioopm_list_t *list, int index)
   return prev_link->next->value;
 }
 
+int ioopm_linked_list_size(ioopm_list_t *list)
+{
+  return list->size;
+}
+
