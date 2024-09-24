@@ -4,7 +4,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
+
 #include "../src/hash_table.h"
+#include "../src/linked_list.h"
 
 #define Free(ptr) {free(ptr); ptr = NULL; }
 
@@ -20,16 +23,17 @@ int clean_suite(void) {
   return 0;
 }
 
-// These are example test functions. You should replace them with
-// functions of your own.
-void test_create_destroy()
+
+// Start of hash_table function tests.
+
+void test_ht_create_destroy()
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
   CU_ASSERT_PTR_NOT_NULL(ht);
   ioopm_hash_table_destroy(ht);
 }
 
-void test_insert_once() {
+void test_ht_insert_once() {
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
 
   char *value1 = NULL;
@@ -46,7 +50,7 @@ void test_insert_once() {
   ioopm_hash_table_destroy(ht);
 }
 
-void test_lookup_empty()
+void test_ht_lookup_empty()
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
   for (int i = 0; i < 18; ++i) /// 18 is a bit magical
@@ -62,7 +66,7 @@ void test_lookup_empty()
   ioopm_hash_table_destroy(ht);
 }
 
-void test_remove()
+void test_ht_remove()
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
 
@@ -82,7 +86,7 @@ void test_remove()
   ioopm_hash_table_destroy(ht);
 }
 
-void test_size()
+void test_ht_size()
 {
   ioopm_hash_table_t *ht_empty = ioopm_hash_table_create();
   CU_ASSERT_EQUAL(ioopm_hash_table_size(ht_empty), 0);
@@ -103,7 +107,7 @@ void test_size()
   ioopm_hash_table_destroy(ht_multi);
 }
 
-void test_empty()
+void test_ht_empty()
 {
   ioopm_hash_table_t *ht_empty = ioopm_hash_table_create();
   CU_ASSERT_TRUE(ioopm_hash_table_is_empty(ht_empty));
@@ -117,7 +121,7 @@ void test_empty()
   ioopm_hash_table_destroy(ht_nonempty);
 }
 
-void test_clear()
+void test_ht_clear()
 {
   ioopm_hash_table_t *ht_already_empty = ioopm_hash_table_create();
   ioopm_hash_table_clear(ht_already_empty);
@@ -136,7 +140,7 @@ void test_clear()
   ioopm_hash_table_destroy(ht_nonempty);
 }
 
-void test_keys()
+void test_ht_keys()
 {
   int keys[5] = {5, 0, 22, 511, 32};
   bool found[5] = { false };
@@ -176,7 +180,7 @@ void test_keys()
   ioopm_hash_table_destroy(ht);
 }
 
-void test_values()
+void test_ht_values()
 {
   char *values[5] = {"val1", "val2", "val3", "val4", "val5"};
   int keys[5] = {5, 0, 22, 511, 32};
@@ -214,7 +218,7 @@ void test_values()
   ioopm_hash_table_destroy(ht);
 }
 
-void test_keys_values_match()
+void test_ht_keys_values_match()
 {
   int keys[5] = {3, 10, 42, 0, 99};
   char *values[5] = {"three", "ten", "fortytwo", "zero", "ninetynine"};
@@ -245,7 +249,7 @@ void test_keys_values_match()
   ioopm_hash_table_destroy(ht);
 }
 
-void test_has_key()
+void test_ht_has_key()
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
  
@@ -260,7 +264,7 @@ void test_has_key()
   ioopm_hash_table_destroy(ht);
 }
 
-void test_has_value()
+void test_ht_has_value()
 {
   // Note C lang does not specify if two equal string literals are stored
   // in the same place in memory. Need to check properly.
@@ -288,7 +292,7 @@ static bool matches_string(int key, char *value, char *match_for)
   return strcmp(value, match_for) == 0;
 }
 
-void test_valid_for_all()
+void test_ht_valid_for_all()
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
 
@@ -304,7 +308,7 @@ void test_valid_for_all()
   ioopm_hash_table_destroy(ht);
 }
 
-void test_valid_for_any()
+void test_ht_valid_for_any()
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
 
@@ -334,7 +338,7 @@ static void count_occurences(int key, char **value, void *arg)
   }
 }
 
-void test_apply_all()
+void test_ht_apply_all()
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
   
@@ -352,6 +356,127 @@ void test_apply_all()
   ioopm_hash_table_destroy(ht);
 }
 
+
+// Start of linked_list function tests.
+
+/*
+Test boilerplate
+
+  ioopm_list_t *lst = ioopm_linked_list_create();
+
+
+
+  ioopm_linked_list_destroy(lst);
+*/
+
+void test_list_create_destroy()
+{
+  ioopm_list_t *lst = ioopm_linked_list_create();
+  CU_ASSERT_PTR_NOT_NULL(lst);
+  ioopm_linked_list_destroy(lst);
+}
+
+void test_list_prepend()
+{
+  ioopm_list_t *lst = ioopm_linked_list_create();
+
+  ioopm_linked_list_prepend(lst, 5);
+  ioopm_linked_list_prepend(lst, 6);
+  ioopm_linked_list_prepend(lst, 7);
+
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0), 7);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 1), 6);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2), 5);
+
+  ioopm_linked_list_destroy(lst);
+}
+
+void test_list_append()
+{
+  ioopm_list_t *lst = ioopm_linked_list_create();
+
+  ioopm_linked_list_append(lst, 25);
+  ioopm_linked_list_append(lst, 41);
+  ioopm_linked_list_append(lst, 5);
+
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0), 25);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 1), 41);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2), 5);
+
+  ioopm_linked_list_destroy(lst);
+}
+
+void test_list_insert()
+{
+  ioopm_list_t *lst = ioopm_linked_list_create();
+
+  ioopm_linked_list_insert(lst, 0, 5);
+  ioopm_linked_list_insert(lst, 1, 10);
+  ioopm_linked_list_insert(lst, 1, 15);
+
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0), 5);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 1), 15);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2), 10);
+  CU_ASSERT_EQUAL(ioopm_linked_list_size(lst), 3);
+
+  ioopm_linked_list_destroy(lst);
+}
+
+void test_list_remove()
+{
+  ioopm_list_t *lst = ioopm_linked_list_create();
+
+  ioopm_linked_list_append(lst, 10);
+  ioopm_linked_list_append(lst, 20);
+  ioopm_linked_list_append(lst, 30);
+  ioopm_linked_list_append(lst, 40);
+
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2), 30);
+  CU_ASSERT_EQUAL(ioopm_linked_list_size(lst), 4);
+
+  CU_ASSERT_EQUAL(ioopm_linked_list_remove(lst, 2), 30);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2), 40);
+  CU_ASSERT_EQUAL(ioopm_linked_list_size(lst), 3);
+
+  CU_ASSERT_EQUAL(ioopm_linked_list_remove(lst, 0), 10);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0), 20);
+
+  ioopm_linked_list_destroy(lst);
+}
+
+void test_list_get()
+{
+  ioopm_list_t *lst = ioopm_linked_list_create();
+
+  ioopm_linked_list_append(lst, 100);
+  ioopm_linked_list_append(lst, 110);
+  ioopm_linked_list_append(lst, 120);
+  ioopm_linked_list_append(lst, 130);
+  ioopm_linked_list_append(lst, 140);
+
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0), 100);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2), 120);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 4), 140);
+
+  ioopm_linked_list_destroy(lst);
+}
+
+void test_list_size()
+{
+  ioopm_list_t *lst = ioopm_linked_list_create();
+
+  ioopm_linked_list_append(lst, 25);
+  ioopm_linked_list_append(lst, 25);
+  ioopm_linked_list_append(lst, 25);
+  ioopm_linked_list_append(lst, 25);
+
+  CU_ASSERT_EQUAL(ioopm_linked_list_size(lst), 4);
+
+  ioopm_linked_list_destroy(lst);
+}
+
+
+
 int main() {
   // First we try to set up CUnit, and exit if we fail
   if (CU_initialize_registry() != CUE_SUCCESS)
@@ -360,7 +485,10 @@ int main() {
   // We then create an empty test suite and specify the name and
   // the init and cleanup functions
   CU_pSuite hash_table_suite = CU_add_suite("Hash table", init_suite, clean_suite);
-  if (hash_table_suite == NULL) {
+  CU_pSuite linked_list_suite = CU_add_suite("Linked list", init_suite, clean_suite);
+  if (hash_table_suite == NULL ||
+      linked_list_suite == NULL)
+  {
       // If the test suite could not be added, tear down CUnit and exit
       CU_cleanup_registry();
       return CU_get_error();
@@ -372,21 +500,29 @@ int main() {
   // the test in question. If you want to add another test, just
   // copy a line below and change the information
   if (
-    (CU_add_test(hash_table_suite, "create destroy", test_create_destroy) == NULL) ||
-    (CU_add_test(hash_table_suite, "insert once, lookup", test_insert_once) == NULL) ||
-    (CU_add_test(hash_table_suite, "lookup empty", test_lookup_empty) == NULL) ||
-    (CU_add_test(hash_table_suite, "remove", test_remove) == NULL) ||
-    (CU_add_test(hash_table_suite, "size", test_size) == NULL) ||
-    (CU_add_test(hash_table_suite, "empty", test_empty) == NULL) ||
-    (CU_add_test(hash_table_suite, "clear", test_clear) == NULL) ||
-    (CU_add_test(hash_table_suite, "keys", test_keys) == NULL) ||
-    (CU_add_test(hash_table_suite, "values", test_values) == NULL) ||
-    (CU_add_test(hash_table_suite, "keys values index match", test_keys_values_match) == NULL) ||
-    (CU_add_test(hash_table_suite, "has key", test_has_key) == NULL) ||
-    (CU_add_test(hash_table_suite, "has value", test_has_value) == NULL) ||
-    (CU_add_test(hash_table_suite, "valid for all", test_valid_for_all) == NULL) ||
-    (CU_add_test(hash_table_suite, "valid for any", test_valid_for_any) == NULL) ||
-    (CU_add_test(hash_table_suite, "apply all", test_apply_all) == NULL) ||
+    (CU_add_test(hash_table_suite, "create destroy", test_ht_create_destroy) == NULL) ||
+    (CU_add_test(hash_table_suite, "insert once, lookup", test_ht_insert_once) == NULL) ||
+    (CU_add_test(hash_table_suite, "lookup empty", test_ht_lookup_empty) == NULL) ||
+    (CU_add_test(hash_table_suite, "remove", test_ht_remove) == NULL) ||
+    (CU_add_test(hash_table_suite, "size", test_ht_size) == NULL) ||
+    (CU_add_test(hash_table_suite, "empty", test_ht_empty) == NULL) ||
+    (CU_add_test(hash_table_suite, "clear", test_ht_clear) == NULL) ||
+    (CU_add_test(hash_table_suite, "keys", test_ht_keys) == NULL) ||
+    (CU_add_test(hash_table_suite, "values", test_ht_values) == NULL) ||
+    (CU_add_test(hash_table_suite, "keys values index match", test_ht_keys_values_match) == NULL) ||
+    (CU_add_test(hash_table_suite, "has key", test_ht_has_key) == NULL) ||
+    (CU_add_test(hash_table_suite, "has value", test_ht_has_value) == NULL) ||
+    (CU_add_test(hash_table_suite, "valid for all", test_ht_valid_for_all) == NULL) ||
+    (CU_add_test(hash_table_suite, "valid for any", test_ht_valid_for_any) == NULL) ||
+    (CU_add_test(hash_table_suite, "apply all", test_ht_apply_all) == NULL) ||
+    0 ||
+    (CU_add_test(linked_list_suite, "create destroy", test_list_create_destroy) == NULL) ||
+    (CU_add_test(linked_list_suite, "prepend", test_list_prepend) == NULL) ||
+    (CU_add_test(linked_list_suite, "append", test_list_append) == NULL) ||
+    (CU_add_test(linked_list_suite, "insert", test_list_insert) == NULL) ||
+    (CU_add_test(linked_list_suite, "remove", test_list_remove) == NULL) ||
+    (CU_add_test(linked_list_suite, "get", test_list_get) == NULL) ||
+    (CU_add_test(linked_list_suite, "size", test_list_size) == NULL) ||
     0
   )
     {

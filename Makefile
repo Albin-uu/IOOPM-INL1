@@ -26,13 +26,16 @@ testnovalgrind: testbuild
 .PHONY: test testnovalgrind run
 
 # Build.
-normalbuild: hash_table.o
+# include the main file on normal build when it is created
+normalbuild: hash_table.o linked_list.o
 	$(C_COMPILER) $(C_LINK_OPTIONS) $^ -g -o $@
-testbuild: hash_table.o unit_tests.o
+testbuild: unit_tests.o hash_table.o linked_list.o
 	$(C_COMPILER) $(C_LINK_OPTIONS) $? -g -o $@ $(CUNIT_LINK) 
 
 # Source files.
 hash_table.o: src/hash_table.c
+	$(C_COMPILER) $(C_OPTIONS) $^ -c
+linked_list.o: src/linked_list.c
 	$(C_COMPILER) $(C_OPTIONS) $^ -c
 
 # Test files.

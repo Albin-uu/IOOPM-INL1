@@ -7,7 +7,7 @@
 
 #include "hash_table.h"
 
-#define HASH_TABLE_SIZE ((int)17)
+#define HASH_TABLE_ARRAY_SIZE ((int)17)
 
 typedef struct entry entry_t;
 
@@ -20,7 +20,7 @@ struct entry
 
 struct hash_table
 {
-  entry_t buckets[HASH_TABLE_SIZE];
+  entry_t buckets[HASH_TABLE_ARRAY_SIZE];
   int size;
 };
 
@@ -74,7 +74,7 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, int key, char *value)
   // Make sure key is not negative.
   assert(key >= 0);
 
-  int bucket = key % HASH_TABLE_SIZE;
+  int bucket = key % HASH_TABLE_ARRAY_SIZE;
 
   entry_t *entry = find_previous_entry_for_key(&ht->buckets[bucket], key);
   entry_t *next = entry->next;
@@ -98,7 +98,7 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, int key, char **result)
     return false;
   }
 
-  int ht_index = key % HASH_TABLE_SIZE;
+  int ht_index = key % HASH_TABLE_ARRAY_SIZE;
   entry_t *prev_entry_ptr = find_previous_entry_for_key(&ht->buckets[ht_index], key);
 
   if (prev_entry_ptr->next == NULL)
@@ -114,7 +114,7 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, int key, char **result)
 
 bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, int key)
 {
-  int bucket = key % HASH_TABLE_SIZE;
+  int bucket = key % HASH_TABLE_ARRAY_SIZE;
   entry_t *prev_entry_ptr = find_previous_entry_for_key(&ht->buckets[bucket], key);
   entry_t *to_be_removed = prev_entry_ptr->next;
 
@@ -149,7 +149,7 @@ void ioopm_hash_table_clear(ioopm_hash_table_t *ht)
   entry_t *current_entry = NULL;
   entry_t *next_entry = NULL;
 
-  for (int i = 0; i < HASH_TABLE_SIZE; i++)
+  for (int i = 0; i < HASH_TABLE_ARRAY_SIZE; i++)
   {
     sentinel = &ht->buckets[i];
     current_entry = sentinel;
@@ -185,7 +185,7 @@ int *ioopm_hash_table_keys(ioopm_hash_table_t *ht)
 
   entry_t *buckets = ht->buckets;
   entry_t *current = NULL;
-  for (int i = 0; i < HASH_TABLE_SIZE; i++)
+  for (int i = 0; i < HASH_TABLE_ARRAY_SIZE; i++)
   {
     current = buckets[i].next;
     while (current != NULL)
@@ -207,7 +207,7 @@ char **ioopm_hash_table_values(ioopm_hash_table_t *ht)
 
   entry_t *buckets = ht->buckets;
   entry_t *current = NULL;
-  for (int i = 0; i < HASH_TABLE_SIZE; i++)
+  for (int i = 0; i < HASH_TABLE_ARRAY_SIZE; i++)
   {
     current = buckets[i].next;
     while (current != NULL)
