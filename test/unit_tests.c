@@ -20,16 +20,17 @@ int clean_suite(void) {
   return 0;
 }
 
-// These are example test functions. You should replace them with
-// functions of your own.
-void test_create_destroy()
+
+// Start of hash_table function tests.
+
+void test_ht_create_destroy()
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
   CU_ASSERT_PTR_NOT_NULL(ht);
   ioopm_hash_table_destroy(ht);
 }
 
-void test_insert_once() {
+void test_ht_insert_once() {
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
 
   char *value1 = NULL;
@@ -46,7 +47,7 @@ void test_insert_once() {
   ioopm_hash_table_destroy(ht);
 }
 
-void test_lookup_empty()
+void test_ht_lookup_empty()
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
   for (int i = 0; i < 18; ++i) /// 18 is a bit magical
@@ -62,7 +63,7 @@ void test_lookup_empty()
   ioopm_hash_table_destroy(ht);
 }
 
-void test_remove()
+void test_ht_remove()
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
 
@@ -82,7 +83,7 @@ void test_remove()
   ioopm_hash_table_destroy(ht);
 }
 
-void test_size()
+void test_ht_size()
 {
   ioopm_hash_table_t *ht_empty = ioopm_hash_table_create();
   CU_ASSERT_EQUAL(ioopm_hash_table_size(ht_empty), 0);
@@ -103,7 +104,7 @@ void test_size()
   ioopm_hash_table_destroy(ht_multi);
 }
 
-void test_empty()
+void test_ht_empty()
 {
   ioopm_hash_table_t *ht_empty = ioopm_hash_table_create();
   CU_ASSERT_TRUE(ioopm_hash_table_is_empty(ht_empty));
@@ -117,7 +118,7 @@ void test_empty()
   ioopm_hash_table_destroy(ht_nonempty);
 }
 
-void test_clear()
+void test_ht_clear()
 {
   ioopm_hash_table_t *ht_already_empty = ioopm_hash_table_create();
   ioopm_hash_table_clear(ht_already_empty);
@@ -136,7 +137,7 @@ void test_clear()
   ioopm_hash_table_destroy(ht_nonempty);
 }
 
-void test_keys()
+void test_ht_keys()
 {
   int keys[5] = {5, 0, 22, 511, 32};
   bool found[5] = { false };
@@ -176,7 +177,7 @@ void test_keys()
   ioopm_hash_table_destroy(ht);
 }
 
-void test_values()
+void test_ht_values()
 {
   char *values[5] = {"val1", "val2", "val3", "val4", "val5"};
   int keys[5] = {5, 0, 22, 511, 32};
@@ -214,7 +215,7 @@ void test_values()
   ioopm_hash_table_destroy(ht);
 }
 
-void test_keys_values_match()
+void test_ht_keys_values_match()
 {
   int keys[5] = {3, 10, 42, 0, 99};
   char *values[5] = {"three", "ten", "fortytwo", "zero", "ninetynine"};
@@ -245,7 +246,7 @@ void test_keys_values_match()
   ioopm_hash_table_destroy(ht);
 }
 
-void test_has_key()
+void test_ht_has_key()
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
  
@@ -260,7 +261,7 @@ void test_has_key()
   ioopm_hash_table_destroy(ht);
 }
 
-void test_has_value()
+void test_ht_has_value()
 {
   // Note C lang does not specify if two equal string literals are stored
   // in the same place in memory. Need to check properly.
@@ -288,7 +289,7 @@ static bool matches_string(int key, char *value, char *match_for)
   return strcmp(value, match_for) == 0;
 }
 
-void test_valid_for_all()
+void test_ht_valid_for_all()
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
 
@@ -304,7 +305,7 @@ void test_valid_for_all()
   ioopm_hash_table_destroy(ht);
 }
 
-void test_valid_for_any()
+void test_ht_valid_for_any()
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
 
@@ -334,7 +335,7 @@ static void count_occurences(int key, char **value, void *arg)
   }
 }
 
-void test_apply_all()
+void test_ht_apply_all()
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
   
@@ -372,21 +373,21 @@ int main() {
   // the test in question. If you want to add another test, just
   // copy a line below and change the information
   if (
-    (CU_add_test(hash_table_suite, "create destroy", test_create_destroy) == NULL) ||
-    (CU_add_test(hash_table_suite, "insert once, lookup", test_insert_once) == NULL) ||
-    (CU_add_test(hash_table_suite, "lookup empty", test_lookup_empty) == NULL) ||
-    (CU_add_test(hash_table_suite, "remove", test_remove) == NULL) ||
-    (CU_add_test(hash_table_suite, "size", test_size) == NULL) ||
-    (CU_add_test(hash_table_suite, "empty", test_empty) == NULL) ||
-    (CU_add_test(hash_table_suite, "clear", test_clear) == NULL) ||
-    (CU_add_test(hash_table_suite, "keys", test_keys) == NULL) ||
-    (CU_add_test(hash_table_suite, "values", test_values) == NULL) ||
-    (CU_add_test(hash_table_suite, "keys values index match", test_keys_values_match) == NULL) ||
-    (CU_add_test(hash_table_suite, "has key", test_has_key) == NULL) ||
-    (CU_add_test(hash_table_suite, "has value", test_has_value) == NULL) ||
-    (CU_add_test(hash_table_suite, "valid for all", test_valid_for_all) == NULL) ||
-    (CU_add_test(hash_table_suite, "valid for any", test_valid_for_any) == NULL) ||
-    (CU_add_test(hash_table_suite, "apply all", test_apply_all) == NULL) ||
+    (CU_add_test(hash_table_suite, "create destroy", test_ht_create_destroy) == NULL) ||
+    (CU_add_test(hash_table_suite, "insert once, lookup", test_ht_insert_once) == NULL) ||
+    (CU_add_test(hash_table_suite, "lookup empty", test_ht_lookup_empty) == NULL) ||
+    (CU_add_test(hash_table_suite, "remove", test_ht_remove) == NULL) ||
+    (CU_add_test(hash_table_suite, "size", test_ht_size) == NULL) ||
+    (CU_add_test(hash_table_suite, "empty", test_ht_empty) == NULL) ||
+    (CU_add_test(hash_table_suite, "clear", test_ht_clear) == NULL) ||
+    (CU_add_test(hash_table_suite, "keys", test_ht_keys) == NULL) ||
+    (CU_add_test(hash_table_suite, "values", test_ht_values) == NULL) ||
+    (CU_add_test(hash_table_suite, "keys values index match", test_ht_keys_values_match) == NULL) ||
+    (CU_add_test(hash_table_suite, "has key", test_ht_has_key) == NULL) ||
+    (CU_add_test(hash_table_suite, "has value", test_ht_has_value) == NULL) ||
+    (CU_add_test(hash_table_suite, "valid for all", test_ht_valid_for_all) == NULL) ||
+    (CU_add_test(hash_table_suite, "valid for any", test_ht_valid_for_any) == NULL) ||
+    (CU_add_test(hash_table_suite, "apply all", test_ht_apply_all) == NULL) ||
     0
   )
     {
