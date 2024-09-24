@@ -118,3 +118,37 @@ void ioopm_linked_list_append(ioopm_list_t *list, int value)
   size_increment(list);
 }
 
+void ioopm_linked_list_insert(ioopm_list_t *list, int index, int value)
+{
+  // +1 since inserting will count index as after the insertion.
+  assert(index >= 0 && index < ioopm_linked_list_size(list) + 1);
+
+  list_link *prev_link = get_link_before_index(list, index);
+  list_link *new_link = calloc(1, sizeof(list_link));
+
+  new_link->next = prev_link->next;
+  prev_link->next = new_link;
+
+  new_link->value = value;
+  size_increment(list);
+}
+
+int ioopm_linked_list_remove(ioopm_list_t *list, int index)
+{
+  assert(index >= 0 && index < ioopm_linked_list_size(list));
+
+  list_link *prev_link = get_link_before_index(list, index);
+  list_link *to_be_removed = prev_link->next;
+
+  // Edge case if elem is last in list.
+  if (index == ioopm_linked_list_size(list) - 1) { list->last = prev_link; }
+
+  prev_link->next = to_be_removed->next;
+  
+  int value_of_removed = to_be_removed->value;
+  free(to_be_removed);
+  size_decrement(list);
+
+  return value_of_removed;
+}
+
