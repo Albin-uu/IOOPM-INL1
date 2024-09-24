@@ -152,3 +152,11 @@ int ioopm_linked_list_remove(ioopm_list_t *list, int index)
   return value_of_removed;
 }
 
+int ioopm_linked_list_get(ioopm_list_t *list, int index)
+{
+  assert(index >= 0 && index < ioopm_linked_list_size(list));
+
+  list_link *prev_link = get_link_before_index(list, index);
+  return prev_link->next->value;
+}
+

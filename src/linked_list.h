@@ -48,3 +48,11 @@ void ioopm_linked_list_insert(ioopm_list_t *list, int index, int value);
 /// @return the value removed
 int ioopm_linked_list_remove(ioopm_list_t *list, int index);
 
+/// @brief Retrieve an element from a linked list in O(n) time.
+/// The valid values of index are [0,n-1] for a list of n elements,
+/// where 0 means the first element and n-1 means the last element.
+/// @param list the linked list that will be extended
+/// @param index the position in the list
+/// @return the value at the given position
+int ioopm_linked_list_get(ioopm_list_t *list, int index);
+
