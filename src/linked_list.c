@@ -58,3 +58,35 @@ static list_link *get_link_before_index(ioopm_list_t *list, int index)
 }
 
 
+ioopm_list_t *ioopm_linked_list_create(void)
+{
+  ioopm_list_t *list = calloc(1, sizeof(ioopm_list_t));
+  list_link *sentinel = calloc(1, sizeof(list_link));
+
+  sentinel->next = NULL;
+  sentinel->value = 0;
+
+  list->first = sentinel;
+  list->last = sentinel;
+  list->size = 0;
+
+  return list;
+}
+
+void ioopm_linked_list_destroy(ioopm_list_t *list)
+{
+  list_link *current = list->first;
+  list_link *next = NULL;
+
+  // Always free sentinel.
+  do
+  {
+    next = current->next;
+    free(current);
+    current = next;
+  }
+  while (next != NULL);
+
+  free(list);
+}
+
