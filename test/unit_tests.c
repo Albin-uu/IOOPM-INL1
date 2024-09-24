@@ -4,7 +4,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
+
 #include "../src/hash_table.h"
+#include "../src/linked_list.h"
 
 #define Free(ptr) {free(ptr); ptr = NULL; }
 
@@ -353,6 +356,26 @@ void test_ht_apply_all()
   ioopm_hash_table_destroy(ht);
 }
 
+
+// Start of linked_list function tests.
+
+/*
+Test boilerplate
+
+  ioopm_list_t *lst = ioopm_linked_list_create();
+
+
+
+  ioopm_linked_list_destroy(lst);
+*/
+
+void test_list_create_destroy()
+{
+  ioopm_list_t *lst = ioopm_linked_list_create();
+  CU_ASSERT_PTR_NOT_NULL(lst);
+  ioopm_linked_list_destroy(lst);
+}
+
 int main() {
   // First we try to set up CUnit, and exit if we fail
   if (CU_initialize_registry() != CUE_SUCCESS)
@@ -361,7 +384,10 @@ int main() {
   // We then create an empty test suite and specify the name and
   // the init and cleanup functions
   CU_pSuite hash_table_suite = CU_add_suite("Hash table", init_suite, clean_suite);
-  if (hash_table_suite == NULL) {
+  CU_pSuite linked_list_suite = CU_add_suite("Linked list", init_suite, clean_suite);
+  if (hash_table_suite == NULL ||
+      linked_list_suite == NULL)
+  {
       // If the test suite could not be added, tear down CUnit and exit
       CU_cleanup_registry();
       return CU_get_error();
@@ -388,6 +414,8 @@ int main() {
     (CU_add_test(hash_table_suite, "valid for all", test_ht_valid_for_all) == NULL) ||
     (CU_add_test(hash_table_suite, "valid for any", test_ht_valid_for_any) == NULL) ||
     (CU_add_test(hash_table_suite, "apply all", test_ht_apply_all) == NULL) ||
+    0 ||
+    (CU_add_test(linked_list_suite, "create destroy", test_list_create_destroy) == NULL) ||
     0
   )
     {
