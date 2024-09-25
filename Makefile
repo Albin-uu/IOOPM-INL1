@@ -30,7 +30,7 @@ testnovalgrind: testbuild
 normalbuild: hash_table.o linked_list.o
 	$(C_COMPILER) $(C_LINK_OPTIONS) $^ -g -o $@
 testbuild: unit_tests.o hash_table.o linked_list.o
-	$(C_COMPILER) $(C_LINK_OPTIONS) $? -g -o $@ $(CUNIT_LINK) 
+	$(C_COMPILER) $(C_LINK_OPTIONS) $^ -g -o $@ $(CUNIT_LINK) 
 
 # Source files.
 hash_table.o: src/hash_table.c
