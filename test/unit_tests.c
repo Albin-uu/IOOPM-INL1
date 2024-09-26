@@ -475,6 +475,36 @@ void test_list_size()
   ioopm_linked_list_destroy(lst);
 }
 
+void test_list_empty()
+{
+  ioopm_list_t *lst = ioopm_linked_list_create();
+
+  CU_ASSERT_TRUE(ioopm_linked_list_is_empty(lst));
+  ioopm_linked_list_append(lst, 42);
+  CU_ASSERT_FALSE(ioopm_linked_list_is_empty(lst));
+
+  ioopm_linked_list_destroy(lst);
+}
+
+void test_list_clear()
+{
+  ioopm_list_t *lst = ioopm_linked_list_create();
+
+  ioopm_linked_list_append(lst, 1);
+  ioopm_linked_list_append(lst, 2);
+  ioopm_linked_list_append(lst, 3);
+  ioopm_linked_list_append(lst, 4);
+
+  ioopm_linked_list_clear(lst);
+  CU_ASSERT_EQUAL(ioopm_linked_list_size(lst), 0);
+
+  ioopm_linked_list_append(lst, 5);
+  CU_ASSERT_EQUAL(ioopm_linked_list_size(lst), 1);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0), 5);
+
+  ioopm_linked_list_destroy(lst);
+}
+
 
 
 int main() {
@@ -523,6 +553,8 @@ int main() {
     (CU_add_test(linked_list_suite, "remove", test_list_remove) == NULL) ||
     (CU_add_test(linked_list_suite, "get", test_list_get) == NULL) ||
     (CU_add_test(linked_list_suite, "size", test_list_size) == NULL) ||
+    (CU_add_test(linked_list_suite, "empty", test_list_empty) == NULL) ||
+    (CU_add_test(linked_list_suite, "clear", test_list_clear) == NULL) ||
     0
   )
     {
