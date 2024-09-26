@@ -26,7 +26,7 @@ struct list
 
 static void size_increment(ioopm_list_t *list) { list->size++; }
 static void size_decrement(ioopm_list_t *list) { list->size--; }
-static void size_reset(ioopm_list_t *list) { list->size++; }
+static void size_reset(ioopm_list_t *list) { list->size = 0; }
 
 
 static list_link *first_proper_elem(ioopm_list_t *list)
