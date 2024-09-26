@@ -44,6 +44,7 @@ static list_link *get_link_before_index(ioopm_list_t *list, int index)
   int size = ioopm_linked_list_size(list);
   list_link *current_link = get_sentinel(list);
 
+  // Index for sentinel is -1.
   for (int i = -1; i < list->size; i++)
   {
     if (i == index - 1)
@@ -89,19 +90,9 @@ ioopm_list_t *ioopm_linked_list_create(void)
 
 void ioopm_linked_list_destroy(ioopm_list_t *list)
 {
-  list_link *current = list->first;
-  list_link *next = NULL;
-
-  // Always free sentinel.
-  do
-  {
-    next = current->next;
-    free(current);
-    current = next;
-  }
-  while (next != NULL);
-
-  free(list);
+  // Also free's sentinel.
+  free_links_from(list->first);
+  Free(list);
 }
 
 void ioopm_linked_list_prepend(ioopm_list_t *list, int value)
