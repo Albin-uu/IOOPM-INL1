@@ -7,6 +7,14 @@ long arr_long[] = {5, 6, 7, 8, 9};
 
 int main(void)
 {
+  int *arr_ptr= &arr_int[0];
+  printf("first elem: %d\n", *arr_ptr);
+  arr_ptr++;
+  printf("second elem: %d\n", *arr_ptr);
+  arr_ptr = arr_ptr + 1;
+  printf("third elem: %d\n\n",*arr_ptr);
+
+
   printf("sizeof int: %lu\n", sizeof(int));
   printf("normal int: %d\n", arr_int[2]);
   printf("wrong int: %d\n\n", 2[arr_int]);
