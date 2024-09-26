@@ -7,6 +7,8 @@
 
 #include "linked_list.h"
 
+#define Free(ptr) {free(ptr); ptr = NULL; }
+
 typedef struct link list_link;
 struct link
 {
@@ -146,7 +148,7 @@ int ioopm_linked_list_remove(ioopm_list_t *list, int index)
   prev_link->next = to_be_removed->next;
   
   int value_of_removed = to_be_removed->value;
-  free(to_be_removed);
+  Free(to_be_removed);
   size_decrement(list);
 
   return value_of_removed;
