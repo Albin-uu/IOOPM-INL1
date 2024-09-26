@@ -61,3 +61,12 @@ int ioopm_linked_list_get(ioopm_list_t *list, int index);
 /// @return the number of elements in the list
 int ioopm_linked_list_size(ioopm_list_t *list);
 
+/// @brief Test whether a list is empty or not
+/// @param list the linked list
+/// @return true if the number of elements int the list is 0, else false
+bool ioopm_linked_list_is_empty(ioopm_list_t *list);
+
+/// @brief Remove all elements from a linked list
+/// @param list the linked list
+void ioopm_linked_list_clear(ioopm_list_t *list);
+

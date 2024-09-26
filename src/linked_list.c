@@ -59,6 +59,18 @@ static list_link *get_link_before_index(ioopm_list_t *list, int index)
   return current_link;
 }
 
+// Frees all links including and onward from the argument link.
+// Does not change any pointers!
+static void free_links_from(list_link *current)
+{
+  list_link *next = NULL;
+  while (current != NULL)
+  {
+    next = current->next;
+    Free(current);
+    current = next;
+  }
+}
 
 ioopm_list_t *ioopm_linked_list_create(void)
 {
@@ -165,5 +177,23 @@ int ioopm_linked_list_get(ioopm_list_t *list, int index)
 int ioopm_linked_list_size(ioopm_list_t *list)
 {
   return list->size;
+}
+
+bool ioopm_linked_list_is_empty(ioopm_list_t *list)
+{
+  return ioopm_linked_list_size(list) == 0;
+}
+
+void ioopm_linked_list_clear(ioopm_list_t *list)
+{
+  // Don't free sentinel.
+  list_link *first_to_remove = first_proper_elem(list);
+  free_links_from(first_to_remove);
+  first_to_remove = NULL;
+
+  list_link *sentinel = get_sentinel(list);
+  sentinel->next = NULL;
+  list->last = sentinel;
+  size_reset(list);
 }
 
