@@ -45,7 +45,7 @@ static list_link *get_link_before_index(ioopm_list_t *list, int index)
   list_link *current_link = get_sentinel(list);
 
   // Index for sentinel is -1.
-  for (int i = -1; i < list->size; i++)
+  for (int i = -1; i < size; i++)
   {
     if (i == index - 1)
     {
@@ -70,6 +70,46 @@ static void free_links_from(list_link *current)
     next = current->next;
     Free(current);
     current = next;
+  }
+}
+
+typedef struct
+{
+  bool result;
+  bool set_result_on_success;
+  bool set_result_on_failure;
+  ioopm_predicate *pred;
+  void *extra;
+} pred_struct;
+
+static void matches_pred(int index, void *value, pred_struct *p_struct)
+{
+  bool set_if_success = p_struct->set_result_on_success;
+  bool set_if_fail = p_struct->set_result_on_failure;
+  bool pred_successful = p_struct->pred(index, value, p_struct->extra);
+
+  if (set_if_success && pred_successful)
+  {
+    p_struct->result = true;
+  }
+  else if (set_if_fail && !pred_successful)
+  {
+    p_struct->result = false;
+  }
+}
+
+static void iter_for_each(ioopm_list_t *list, ioopm_apply_function *arg_func, void *arg_opt)
+{
+  list_link *current = get_sentinel(list);
+  int index = -1;
+
+  // Check sentinel first in case list empty.
+  while (current->next != NULL)
+  {
+    current = current->next;
+    index++;
+    // & temp until value is generalised
+    arg_func(index, &current->value, arg_opt);
   }
 }
 
