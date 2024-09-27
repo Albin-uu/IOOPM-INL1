@@ -56,6 +56,12 @@ int ioopm_linked_list_remove(ioopm_list_t *list, int index);
 /// @return the value at the given position
 int ioopm_linked_list_get(ioopm_list_t *list, int index);
 
+/// @brief Test if an element is in the list
+/// @param list the linked list
+/// @param element the element sought
+/// @return true if element is in the list, else false
+bool ioopm_linked_list_contains(ioopm_list_t *list, int element);
+
 /// @brief Lookup the number of elements in the linked list in O(1) time
 /// @param list the linked list
 /// @return the number of elements in the list

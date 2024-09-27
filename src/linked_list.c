@@ -205,6 +205,31 @@ int ioopm_linked_list_get(ioopm_list_t *list, int index)
   return prev_link->next->value;
 }
 
+// TODO figure out general function
+static bool is_equal_int(int index, void *value, void *compare_value)
+{
+  int *val = (int *) value;
+  int *compare_val = (int *) compare_value;
+  return *val == *compare_val;
+}
+
+bool ioopm_linked_list_contains(ioopm_list_t *list, int element)
+{
+  // temp &
+  pred_struct p_struct =
+  {
+    // TODO int function to general
+    .pred = &is_equal_int,
+    .extra = &element,
+    .set_result_on_success = true,
+    .set_result_on_failure = false,
+    .result = false,
+  };
+
+  iter_for_each(list, (ioopm_apply_function *) matches_pred, &p_struct);
+  return p_struct.result;
+}
+
 int ioopm_linked_list_size(ioopm_list_t *list)
 {
   return list->size;
