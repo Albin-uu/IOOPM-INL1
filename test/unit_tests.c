@@ -521,6 +521,50 @@ void test_list_clear()
   ioopm_linked_list_destroy(lst);
 }
 
+// Higher-order function to pred tests.
+static bool simple_int_equality(int index, void *value, void *extra)
+{
+  int *comp_num = (int *)extra;
+  int *val = (int *) value;
+  return *comp_num == *val;
+}
+
+void test_list_holds_pred_all()
+{
+  ioopm_list_t *lst = ioopm_linked_list_create();
+  int comp_num = 42;
+
+  ioopm_linked_list_append(lst, 42);
+  ioopm_linked_list_append(lst, 42);
+  ioopm_linked_list_append(lst, 42);
+  ioopm_linked_list_append(lst, 42);
+  ioopm_linked_list_append(lst, 42);
+  CU_ASSERT_TRUE(ioopm_linked_list_all(lst, (ioopm_predicate *) simple_int_equality, &comp_num));
+
+  ioopm_linked_list_insert(lst, 3, 55); 
+  CU_ASSERT_FALSE(ioopm_linked_list_all(lst, (ioopm_predicate *) simple_int_equality, &comp_num));
+
+  ioopm_linked_list_destroy(lst);
+}
+
+void test_list_holds_pred_any()
+{
+  ioopm_list_t *lst = ioopm_linked_list_create();
+  int comp_num = 42;
+
+  ioopm_linked_list_append(lst, 1);
+  ioopm_linked_list_append(lst, 2);
+  ioopm_linked_list_append(lst, 3);
+  ioopm_linked_list_append(lst, 4);
+  ioopm_linked_list_append(lst, 5);
+  CU_ASSERT_FALSE(ioopm_linked_list_any(lst, (ioopm_predicate *) simple_int_equality, &comp_num));
+
+  ioopm_linked_list_insert(lst, 3, 42); 
+  CU_ASSERT_TRUE(ioopm_linked_list_any(lst, (ioopm_predicate *) simple_int_equality, &comp_num));
+
+  ioopm_linked_list_destroy(lst);
+}
+
 
 
 int main() {
@@ -572,6 +616,8 @@ int main() {
     (CU_add_test(linked_list_suite, "size", test_list_size) == NULL) ||
     (CU_add_test(linked_list_suite, "empty", test_list_empty) == NULL) ||
     (CU_add_test(linked_list_suite, "clear", test_list_clear) == NULL) ||
+    (CU_add_test(linked_list_suite, "pred all", test_list_holds_pred_all) == NULL) ||
+    (CU_add_test(linked_list_suite, "pred any", test_list_holds_pred_any) == NULL) ||
     0
   )
     {
