@@ -283,3 +283,7 @@ bool ioopm_linked_list_any(ioopm_list_t *list, ioopm_predicate *pred, void *extr
   return p_struct.result;
 }
 
+void ioopm_linked_list_apply_to_all(ioopm_list_t *list, ioopm_apply_function *fun, void *extra)
+{
+  iter_for_each(list, (ioopm_apply_function *) fun, extra);
+}

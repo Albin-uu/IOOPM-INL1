@@ -92,3 +92,8 @@ bool ioopm_linked_list_all(ioopm_list_t *list, ioopm_predicate *pred, void *extr
 /// @return true if prop holds for any elements in the list, else false
 bool ioopm_linked_list_any(ioopm_list_t *list, ioopm_predicate *pred, void *extra);
 
+/// @brief Apply a supplied function to all elements in a list.
+/// @param list the linked list
+/// @param fun the function to be applied
+/// @param extra an additional argument (may be NULL) that will be passed to all internal calls of fun
+void ioopm_linked_list_apply_to_all(ioopm_list_t *list, ioopm_apply_function *fun, void *extra);
