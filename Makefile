@@ -9,9 +9,6 @@ C_OPTIONS      = -Wall -pedantic -g
 C_LINK_OPTIONS = -lm 
 CUNIT_LINK     = -lcunit
 
-#%.o:  %.c
-#	$(C_COMPILER) $(C_OPTIONS) $^ -c
-
 # Compile and run immediately.
 run: normalbuild
 	@./normalbuild
@@ -22,15 +19,16 @@ test: testbuild
 testnovalgrind: testbuild
 	@./testbuild
 
-# Don't create files with target names, just run the command.
+# Make will avoid trying to search for files with the same name,
+# instead just runs the command.
 .PHONY: test testnovalgrind run
 
 # Build.
-# include the main file on normal build when it is created
+# TODO include the main file on normal build when it is created
 normalbuild: hash_table.o linked_list.o
 	$(C_COMPILER) $(C_LINK_OPTIONS) $^ -g -o $@
 testbuild: unit_tests.o hash_table.o linked_list.o
-	$(C_COMPILER) $(C_LINK_OPTIONS) $? -g -o $@ $(CUNIT_LINK) 
+	$(C_COMPILER) $(C_LINK_OPTIONS) $^ -g -o $@ $(CUNIT_LINK) 
 
 # Source files.
 hash_table.o: src/hash_table.c
@@ -42,9 +40,7 @@ linked_list.o: src/linked_list.c
 unit_tests.o: test/unit_tests.c
 	$(C_COMPILER) $(C_OPTIONS) $^ -c
 
-#inlupp1.final: file1.o file2.o file3.o
-# TODO: add e.g. optimisation flags, remove unnecessary linking, etc.
-
+# Remove temp build files.
 clean:
 	@rm -f *.o testbuild normalbuild a.out
 	@echo "Cleaned files"
