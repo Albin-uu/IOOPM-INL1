@@ -565,6 +565,32 @@ void test_list_holds_pred_any()
   ioopm_linked_list_destroy(lst);
 }
 
+// HOF to test in apply_all
+static void double_ints(int index, void *value, void *extra)
+{
+  int *val = (int *) value;
+  *val = *val * 2;
+}
+
+void test_list_apply_all()
+{
+  ioopm_list_t *lst = ioopm_linked_list_create();
+
+  ioopm_linked_list_append(lst, 1);
+  ioopm_linked_list_append(lst, 2);
+  ioopm_linked_list_append(lst, 3);
+  ioopm_linked_list_append(lst, 4);
+  ioopm_linked_list_append(lst, 5);
+
+  ioopm_linked_list_apply_to_all(lst, (ioopm_apply_function *) double_ints, NULL);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0), 2);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 1), 4);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2), 6);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 3), 8);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 4), 10);
+
+  ioopm_linked_list_destroy(lst);
+}
 
 
 int main() {
@@ -618,6 +644,7 @@ int main() {
     (CU_add_test(linked_list_suite, "clear", test_list_clear) == NULL) ||
     (CU_add_test(linked_list_suite, "pred all", test_list_holds_pred_all) == NULL) ||
     (CU_add_test(linked_list_suite, "pred any", test_list_holds_pred_any) == NULL) ||
+    (CU_add_test(linked_list_suite, "apply all", test_list_apply_all) == NULL) ||
     0
   )
     {
