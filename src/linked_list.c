@@ -253,3 +253,33 @@ void ioopm_linked_list_clear(ioopm_list_t *list)
   size_reset(list);
 }
 
+bool ioopm_linked_list_all(ioopm_list_t *list, ioopm_predicate *pred, void *extra)
+{
+  pred_struct p_struct = {
+    .pred = pred,
+    .result = true,
+    .set_result_on_success = false,
+    .set_result_on_failure = true,  
+    .extra = extra
+  };
+
+  iter_for_each(list, (ioopm_apply_function *) matches_pred, &p_struct);
+
+  return p_struct.result;
+}
+
+bool ioopm_linked_list_any(ioopm_list_t *list, ioopm_predicate *pred, void *extra)
+{
+  pred_struct p_struct = {
+    .pred = pred,
+    .result = false,
+    .set_result_on_success = true,
+    .set_result_on_failure = false,  
+    .extra = extra
+  };
+
+  iter_for_each(list, (ioopm_apply_function *) matches_pred, &p_struct);
+
+  return p_struct.result;
+}
+

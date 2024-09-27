@@ -76,3 +76,19 @@ bool ioopm_linked_list_is_empty(ioopm_list_t *list);
 /// @param list the linked list
 void ioopm_linked_list_clear(ioopm_list_t *list);
 
+/// @brief Test if a supplied property holds for all elements in a list.
+/// The function returns as soon as the return value can be determined.
+/// @param list the linked list
+/// @param pred the property to be tested (function pointer)
+/// @param extra an additional argument (may be NULL) that will be passed to all internal calls of prop
+/// @return true if prop holds for all elements in the list, else false
+bool ioopm_linked_list_all(ioopm_list_t *list, ioopm_predicate *pred, void *extra);
+
+/// @brief Test if a supplied property holds for any element in a list.
+/// The function returns as soon as the return value can be determined.
+/// @param list the linked list
+/// @param pred the property to be tested
+/// @param extra an additional argument (may be NULL) that will be passed to all internal calls of prop
+/// @return true if prop holds for any elements in the list, else false
+bool ioopm_linked_list_any(ioopm_list_t *list, ioopm_predicate *pred, void *extra);
+
