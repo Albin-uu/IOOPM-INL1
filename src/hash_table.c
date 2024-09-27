@@ -257,7 +257,7 @@ bool ioopm_hash_table_has_value(ioopm_hash_table_t *ht, char *value)
   return false;
 }
 
-bool ioopm_hash_table_all(ioopm_hash_table_t *ht, ioopm_predicate *pred, void *arg)
+bool ioopm_hash_table_all(ioopm_hash_table_t *ht, ioopm_ht_predicate *pred, void *arg)
 {
   int size = ioopm_hash_table_size(ht);
   int *keys = ioopm_hash_table_keys(ht);
@@ -274,7 +274,7 @@ bool ioopm_hash_table_all(ioopm_hash_table_t *ht, ioopm_predicate *pred, void *a
   return result;
 }
 
-bool ioopm_hash_table_any(ioopm_hash_table_t *ht, ioopm_predicate *pred, void *arg)
+bool ioopm_hash_table_any(ioopm_hash_table_t *ht, ioopm_ht_predicate *pred, void *arg)
 {
   int size = ioopm_hash_table_size(ht);
   int *keys = ioopm_hash_table_keys(ht);
@@ -291,7 +291,7 @@ bool ioopm_hash_table_any(ioopm_hash_table_t *ht, ioopm_predicate *pred, void *a
   return result;
 }
 
-void ioopm_hash_table_apply_to_all(ioopm_hash_table_t *ht, ioopm_apply_function *apply_fun, void *arg)
+void ioopm_hash_table_apply_to_all(ioopm_hash_table_t *ht, ioopm_ht_apply_function *apply_fun, void *arg)
 {
   int size = ioopm_hash_table_size(ht);
   int *keys = ioopm_hash_table_keys(ht);

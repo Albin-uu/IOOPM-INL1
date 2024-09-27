@@ -300,10 +300,10 @@ void test_ht_valid_for_all()
   ioopm_hash_table_insert(ht, 311, "value to match");
   ioopm_hash_table_insert(ht, 8, "value to match");
   ioopm_hash_table_insert(ht, 241, "other value");
-  CU_ASSERT_FALSE(ioopm_hash_table_all(ht, (ioopm_predicate *) matches_string, "value to match"));
+  CU_ASSERT_FALSE(ioopm_hash_table_all(ht, (ioopm_ht_predicate *) matches_string, "value to match"));
 
   ioopm_hash_table_remove(ht, 241);
-  CU_ASSERT_TRUE(ioopm_hash_table_all(ht, (ioopm_predicate *) matches_string, "value to match"));
+  CU_ASSERT_TRUE(ioopm_hash_table_all(ht, (ioopm_ht_predicate *) matches_string, "value to match"));
 
   ioopm_hash_table_destroy(ht);
 }
@@ -315,10 +315,10 @@ void test_ht_valid_for_any()
   ioopm_hash_table_insert(ht, 42, "value1");
   ioopm_hash_table_insert(ht, 311, "value2");
   ioopm_hash_table_insert(ht, 8, "value3");
-  CU_ASSERT_FALSE(ioopm_hash_table_any(ht, (ioopm_predicate *) matches_string, "value to match"));
+  CU_ASSERT_FALSE(ioopm_hash_table_any(ht, (ioopm_ht_predicate *) matches_string, "value to match"));
 
   ioopm_hash_table_insert(ht, 241, "value to match");
-  CU_ASSERT_TRUE(ioopm_hash_table_any(ht, (ioopm_predicate *) matches_string, "value to match"));
+  CU_ASSERT_TRUE(ioopm_hash_table_any(ht, (ioopm_ht_predicate *) matches_string, "value to match"));
 
   ioopm_hash_table_destroy(ht);
 }
@@ -350,7 +350,7 @@ void test_ht_apply_all()
   ioopm_hash_table_insert(ht, 822, "comparevalue");
   ioopm_hash_table_insert(ht, 5, "something else");
 
-  ioopm_hash_table_apply_to_all(ht, (ioopm_apply_function *) count_occurences, &occ_struct);
+  ioopm_hash_table_apply_to_all(ht, (ioopm_ht_apply_function *) count_occurences, &occ_struct);
   CU_ASSERT_EQUAL(occ_struct.count, 3);
 
   ioopm_hash_table_destroy(ht);
