@@ -3,6 +3,8 @@
 // Needed for size_t.
 #include <stdlib.h>
 
+#include "linked_list.h"
+
 /**
  * @file hash_table.h
  * @author Albin Lord, Karl Wästvind
@@ -60,10 +62,10 @@ bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht);
 void ioopm_hash_table_clear(ioopm_hash_table_t *ht);
 
 /// @brief return the keys for all entries in a hash map (in no particular order, but same as ioopm_hash_table_values)
-/// @brief the array needs to be free'd after use.
+/// @brief the list needs to be ioopm_linked_list_destroy()'d after use.
 /// @param h hash table operated upon
-/// @return an array of keys for hash table h
-int *ioopm_hash_table_keys(ioopm_hash_table_t *ht);
+/// @return a linked list of keys for hash table h
+ioopm_list_t *ioopm_hash_table_keys(ioopm_hash_table_t *ht);
 
 /// @brief return the values for all entries in a hash map (in no particular order, but same as ioopm_hash_table_keys)
 /// @brief the array needs to be free'd after use.

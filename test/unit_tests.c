@@ -153,7 +153,7 @@ void test_ht_keys()
     ioopm_hash_table_insert(ht, keys[i], temp);
   }
 
-  int *gotten_keys = ioopm_hash_table_keys(ht);
+  ioopm_list_t *gotten_keys = ioopm_hash_table_keys(ht);
   bool found_in_keys = false;
 
   for (int i = 0; i < 5; i++)
@@ -162,7 +162,7 @@ void test_ht_keys()
 
     for (int j = 0; j < 5; j++)
     {
-      if (gotten_keys[i] == keys[j])
+      if (ioopm_linked_list_get(gotten_keys, i) == keys[j])
       {
         found[j] = true;
         found_in_keys = true;
@@ -176,7 +176,7 @@ void test_ht_keys()
   // Validate that all keys were found.
   for (int i = 0; i < 5; i++) { CU_ASSERT_TRUE(found[i]); }
 
-  Free(gotten_keys);
+  ioopm_linked_list_destroy(gotten_keys);
   ioopm_hash_table_destroy(ht);
 }
 
@@ -230,13 +230,13 @@ void test_ht_keys_values_match()
     ioopm_hash_table_insert(ht, keys[i], values[i]);
   }
 
-  int *gotten_keys = ioopm_hash_table_keys(ht);
+  ioopm_list_t *gotten_keys = ioopm_hash_table_keys(ht);
   char **gotten_values = ioopm_hash_table_values(ht);
   for (int i = 0; i < 5; i++)
   {
     for (int j = 0; j < 5; j++)
     {
-      if (gotten_keys[i] == keys[j])
+      if (ioopm_linked_list_get(gotten_keys, i) == keys[j])
       {
         CU_ASSERT_STRING_EQUAL(gotten_values[i], values[j]);
         break;
@@ -244,7 +244,7 @@ void test_ht_keys_values_match()
     }
   }
 
-  Free(gotten_keys);
+  ioopm_linked_list_destroy(gotten_keys);
   Free(gotten_values);
   ioopm_hash_table_destroy(ht);
 }
