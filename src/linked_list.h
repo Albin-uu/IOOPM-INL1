@@ -7,7 +7,8 @@
  * @file linked_list.h
  * @author Albin Lord, Karl Wästvind
  * @date 24 Sep 2024
- * @brief TODO.
+ * @brief A simple linked list structure with support
+ * for iterators and higher-order functions.
  */
 
 typedef struct list ioopm_list_t;
@@ -56,7 +57,7 @@ int ioopm_linked_list_remove(ioopm_list_t *list, int index);
 /// @param list the linked list that will be extended
 /// @param index the position in the list
 /// @return the value at the given position
-int ioopm_linked_list_get(ioopm_list_t *list, int index);
+int ioopm_linked_list_get(const ioopm_list_t *list, int index);
 
 /// @brief Test if an element is in the list
 /// @param list the linked list
@@ -67,12 +68,12 @@ bool ioopm_linked_list_contains(ioopm_list_t *list, int element);
 /// @brief Lookup the number of elements in the linked list in O(1) time
 /// @param list the linked list
 /// @return the number of elements in the list
-size_t ioopm_linked_list_size(ioopm_list_t *list);
+size_t ioopm_linked_list_size(const ioopm_list_t *list);
 
 /// @brief Test whether a list is empty or not
 /// @param list the linked list
 /// @return true if the number of elements int the list is 0, else false
-bool ioopm_linked_list_is_empty(ioopm_list_t *list);
+bool ioopm_linked_list_is_empty(const ioopm_list_t *list);
 
 /// @brief Remove all elements from a linked list
 /// @param list the linked list

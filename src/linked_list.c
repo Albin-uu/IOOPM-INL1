@@ -29,17 +29,17 @@ static void size_decrement(ioopm_list_t *list) { list->size--; }
 static void size_reset(ioopm_list_t *list) { list->size = 0; }
 
 
-static list_link *first_proper_elem(ioopm_list_t *list)
+static list_link *first_proper_elem(const ioopm_list_t *list)
   { return list->first->next; }
 
-static list_link *last_proper_elem(ioopm_list_t *list)
+static list_link *last_proper_elem(const ioopm_list_t *list)
   { return list->last; }
 
-static list_link *get_sentinel(ioopm_list_t *list)
+static list_link *get_sentinel(const ioopm_list_t *list)
   { return list->first; }
 
 
-static list_link *get_link_before_index(ioopm_list_t *list, int index)
+static list_link *get_link_before_index(const ioopm_list_t *list, int index)
 {
   size_t size = ioopm_linked_list_size(list);
   list_link *current_link = get_sentinel(list);
@@ -199,7 +199,7 @@ int ioopm_linked_list_remove(ioopm_list_t *list, int index)
   return value_of_removed;
 }
 
-int ioopm_linked_list_get(ioopm_list_t *list, int index)
+int ioopm_linked_list_get(const ioopm_list_t *list, int index)
 {
   assert(index >= 0 && index < ioopm_linked_list_size(list));
 
@@ -232,12 +232,12 @@ bool ioopm_linked_list_contains(ioopm_list_t *list, int element)
   return p_struct.result;
 }
 
-size_t ioopm_linked_list_size(ioopm_list_t *list)
+size_t ioopm_linked_list_size(const ioopm_list_t *list)
 {
   return list->size;
 }
 
-bool ioopm_linked_list_is_empty(ioopm_list_t *list)
+bool ioopm_linked_list_is_empty(const ioopm_list_t *list)
 {
   return ioopm_linked_list_size(list) == 0;
 }
