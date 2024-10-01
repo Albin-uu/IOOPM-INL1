@@ -133,12 +133,12 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, int key)
   }
 }
 
-size_t ioopm_hash_table_size(ioopm_hash_table_t *ht)
+size_t ioopm_hash_table_size(const ioopm_hash_table_t *ht)
 {
   return ht->size;
 }
 
-bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht)
+bool ioopm_hash_table_is_empty(const ioopm_hash_table_t *ht)
 {
   return ioopm_hash_table_size(ht) == 0;
 }
@@ -178,11 +178,11 @@ void ioopm_hash_table_clear(ioopm_hash_table_t *ht)
   ht->size = 0;
 }
 
-ioopm_list_t *ioopm_hash_table_keys(ioopm_hash_table_t *ht)
+ioopm_list_t *ioopm_hash_table_keys(const ioopm_hash_table_t *ht)
 {
   ioopm_list_t *key_list = ioopm_linked_list_create();
 
-  entry_t *buckets = ht->buckets;
+  const entry_t *buckets = ht->buckets;
   entry_t *current = NULL;
   for (int i = 0; i < HASH_TABLE_ARRAY_SIZE; i++)
   {
@@ -197,12 +197,12 @@ ioopm_list_t *ioopm_hash_table_keys(ioopm_hash_table_t *ht)
   return key_list;
 }
 
-char **ioopm_hash_table_values(ioopm_hash_table_t *ht)
+char **ioopm_hash_table_values(const ioopm_hash_table_t *ht)
 {
   char **values = calloc(ioopm_hash_table_size(ht), sizeof(char *));
   int value_counter = 0;
 
-  entry_t *buckets = ht->buckets;
+  const entry_t *buckets = ht->buckets;
   entry_t *current = NULL;
   for (int i = 0; i < HASH_TABLE_ARRAY_SIZE; i++)
   {
@@ -236,7 +236,7 @@ bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, int key)
 
 // Using ioopm_hash_table_any here would
 // degrade performance at a small benefit and add coupling.
-bool ioopm_hash_table_has_value(ioopm_hash_table_t *ht, char *value)
+bool ioopm_hash_table_has_value(ioopm_hash_table_t *ht, const char *value)
 {
   char **ht_values = ioopm_hash_table_values(ht);
   size_t size = ioopm_hash_table_size(ht);
@@ -255,7 +255,7 @@ bool ioopm_hash_table_has_value(ioopm_hash_table_t *ht, char *value)
   return false;
 }
 
-bool ioopm_hash_table_all(ioopm_hash_table_t *ht, ioopm_ht_predicate *pred, void *arg)
+bool ioopm_hash_table_all(const ioopm_hash_table_t *ht, ioopm_ht_predicate *pred, void *arg)
 {
   size_t size = ioopm_hash_table_size(ht);
   ioopm_list_t *keys = ioopm_hash_table_keys(ht);
@@ -274,7 +274,7 @@ bool ioopm_hash_table_all(ioopm_hash_table_t *ht, ioopm_ht_predicate *pred, void
   return result;
 }
 
-bool ioopm_hash_table_any(ioopm_hash_table_t *ht, ioopm_ht_predicate *pred, void *arg)
+bool ioopm_hash_table_any(const ioopm_hash_table_t *ht, ioopm_ht_predicate *pred, void *arg)
 {
   size_t size = ioopm_hash_table_size(ht);
   ioopm_list_t *keys = ioopm_hash_table_keys(ht);
