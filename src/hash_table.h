@@ -1,5 +1,7 @@
 #pragma once
 #include <stdbool.h>
+// Needed for size_t.
+#include <stdlib.h>
 
 /**
  * @file hash_table.h
@@ -46,7 +48,7 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, int key);
 /// @brief returns the number of key => value entries in the hash table
 /// @param h hash table operated upon
 /// @return the number of key => value entries in the hash table
-int ioopm_hash_table_size(ioopm_hash_table_t *ht);
+size_t ioopm_hash_table_size(ioopm_hash_table_t *ht);
 
 /// @brief checks if the hash table is empty
 /// @param h hash table operated upon

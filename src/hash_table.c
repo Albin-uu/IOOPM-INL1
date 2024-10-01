@@ -7,7 +7,7 @@
 
 #include "hash_table.h"
 
-#define HASH_TABLE_ARRAY_SIZE ((int)17)
+#define HASH_TABLE_ARRAY_SIZE ((size_t)17)
 
 typedef struct entry entry_t;
 
@@ -21,7 +21,7 @@ struct entry
 struct hash_table
 {
   entry_t buckets[HASH_TABLE_ARRAY_SIZE];
-  int size;
+  size_t size;
 };
 
 ioopm_hash_table_t *ioopm_hash_table_create(void)
@@ -39,7 +39,6 @@ static void entry_destroy(entry_t * entry_ptr)
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht)
 {
   ioopm_hash_table_clear(ht);
-
   free(ht);
 }
 
@@ -133,7 +132,7 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, int key)
   }
 }
 
-int ioopm_hash_table_size(ioopm_hash_table_t *ht)
+size_t ioopm_hash_table_size(ioopm_hash_table_t *ht)
 {
   return ht->size;
 }
@@ -242,8 +241,9 @@ bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, int key)
 bool ioopm_hash_table_has_value(ioopm_hash_table_t *ht, char *value)
 {
   char **ht_values = ioopm_hash_table_values(ht);
+  size_t size = ioopm_hash_table_size(ht);
 
-  for (int i = 0; i < ht->size; i++)
+  for (int i = 0; i < size; i++)
   {
     // strcmp has weird return values, 0 means equal.
     if (strcmp(ht_values[i], value) == 0)
@@ -259,7 +259,7 @@ bool ioopm_hash_table_has_value(ioopm_hash_table_t *ht, char *value)
 
 bool ioopm_hash_table_all(ioopm_hash_table_t *ht, ioopm_ht_predicate *pred, void *arg)
 {
-  int size = ioopm_hash_table_size(ht);
+  size_t size = ioopm_hash_table_size(ht);
   int *keys = ioopm_hash_table_keys(ht);
   char **values = ioopm_hash_table_values(ht);
   bool result = true;
@@ -276,7 +276,7 @@ bool ioopm_hash_table_all(ioopm_hash_table_t *ht, ioopm_ht_predicate *pred, void
 
 bool ioopm_hash_table_any(ioopm_hash_table_t *ht, ioopm_ht_predicate *pred, void *arg)
 {
-  int size = ioopm_hash_table_size(ht);
+  size_t size = ioopm_hash_table_size(ht);
   int *keys = ioopm_hash_table_keys(ht);
   char **values = ioopm_hash_table_values(ht);
   bool result = false;
@@ -293,7 +293,7 @@ bool ioopm_hash_table_any(ioopm_hash_table_t *ht, ioopm_ht_predicate *pred, void
 
 void ioopm_hash_table_apply_to_all(ioopm_hash_table_t *ht, ioopm_ht_apply_function *apply_fun, void *arg)
 {
-  int size = ioopm_hash_table_size(ht);
+  size_t size = ioopm_hash_table_size(ht);
   int *keys = ioopm_hash_table_keys(ht);
   char **values = ioopm_hash_table_values(ht);
   for (int i = 0; i < size; ++i)
