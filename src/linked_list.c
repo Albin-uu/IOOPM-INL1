@@ -21,7 +21,7 @@ struct list
 {
   list_link *first;
   list_link *last;
-  int size;
+  size_t size;
 };
 
 static void size_increment(ioopm_list_t *list) { list->size++; }
@@ -41,13 +41,15 @@ static list_link *get_sentinel(ioopm_list_t *list)
 
 static list_link *get_link_before_index(ioopm_list_t *list, int index)
 {
-  int size = ioopm_linked_list_size(list);
+  size_t size = ioopm_linked_list_size(list);
   list_link *current_link = get_sentinel(list);
 
-  // Index for sentinel is -1.
-  for (int i = -1; i < size; i++)
+  // Comparison between int and size_t requires int to be positive.
+  // from_sentinel equals list index + 1.
+  for (int from_sentinel = 0; from_sentinel < size + 1; from_sentinel++)
   {
-    if (i == index - 1)
+    // Starting from sentinel adds + 1.
+    if (from_sentinel == index)
     {
       break;
     }
@@ -230,7 +232,7 @@ bool ioopm_linked_list_contains(ioopm_list_t *list, int element)
   return p_struct.result;
 }
 
-int ioopm_linked_list_size(ioopm_list_t *list)
+size_t ioopm_linked_list_size(ioopm_list_t *list)
 {
   return list->size;
 }
