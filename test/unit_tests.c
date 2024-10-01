@@ -6,6 +6,7 @@
 #include <string.h>
 #include <time.h>
 
+#include "../src/common.h"
 #include "../src/hash_table.h"
 #include "../src/linked_list.h"
 
@@ -162,7 +163,7 @@ void test_ht_keys()
 
     for (int j = 0; j < 5; j++)
     {
-      if (ioopm_linked_list_get(gotten_keys, i) == keys[j])
+      if (ioopm_linked_list_get(gotten_keys, i).int_v == keys[j])
       {
         found[j] = true;
         found_in_keys = true;
@@ -236,7 +237,7 @@ void test_ht_keys_values_match()
   {
     for (int j = 0; j < 5; j++)
     {
-      if (ioopm_linked_list_get(gotten_keys, i) == keys[j])
+      if (ioopm_linked_list_get(gotten_keys, i).int_v == keys[j])
       {
         CU_ASSERT_STRING_EQUAL(gotten_values[i], values[j]);
         break;
@@ -371,52 +372,52 @@ Test boilerplate
 
 void test_list_create_destroy()
 {
-  ioopm_list_t *lst = ioopm_linked_list_create();
+  ioopm_list_t *lst = ioopm_linked_list_create((ioopm_eq_function *) ioopm_equals_int);
   CU_ASSERT_PTR_NOT_NULL(lst);
   ioopm_linked_list_destroy(lst);
 }
 
 void test_list_prepend()
 {
-  ioopm_list_t *lst = ioopm_linked_list_create();
+  ioopm_list_t *lst = ioopm_linked_list_create((ioopm_eq_function *) ioopm_equals_int);
 
-  ioopm_linked_list_prepend(lst, 5);
-  ioopm_linked_list_prepend(lst, 6);
-  ioopm_linked_list_prepend(lst, 7);
+  ioopm_linked_list_prepend(lst, int_elem(5));
+  ioopm_linked_list_prepend(lst, int_elem(6));
+  ioopm_linked_list_prepend(lst, int_elem(7));
 
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0), 7);
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 1), 6);
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2), 5);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0).int_v, 7);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 1).int_v, 6);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2).int_v, 5);
 
   ioopm_linked_list_destroy(lst);
 }
 
 void test_list_append()
 {
-  ioopm_list_t *lst = ioopm_linked_list_create();
+  ioopm_list_t *lst = ioopm_linked_list_create((ioopm_eq_function *) ioopm_equals_int);
 
-  ioopm_linked_list_append(lst, 25);
-  ioopm_linked_list_append(lst, 41);
-  ioopm_linked_list_append(lst, 5);
+  ioopm_linked_list_append(lst, int_elem(25));
+  ioopm_linked_list_append(lst, int_elem(41));
+  ioopm_linked_list_append(lst, int_elem(5));
 
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0), 25);
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 1), 41);
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2), 5);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0).int_v, 25);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 1).int_v, 41);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2).int_v, 5);
 
   ioopm_linked_list_destroy(lst);
 }
 
 void test_list_insert()
 {
-  ioopm_list_t *lst = ioopm_linked_list_create();
+  ioopm_list_t *lst = ioopm_linked_list_create((ioopm_eq_function *) ioopm_equals_int);
 
-  ioopm_linked_list_insert(lst, 0, 5);
-  ioopm_linked_list_insert(lst, 1, 10);
-  ioopm_linked_list_insert(lst, 1, 15);
+  ioopm_linked_list_insert(lst, 0, int_elem(5));
+  ioopm_linked_list_insert(lst, 1, int_elem(10));
+  ioopm_linked_list_insert(lst, 1, int_elem(15));
 
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0), 5);
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 1), 15);
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2), 10);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0).int_v, 5);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 1).int_v, 15);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2).int_v, 10);
   CU_ASSERT_EQUAL(ioopm_linked_list_size(lst), 3);
 
   ioopm_linked_list_destroy(lst);
@@ -424,67 +425,67 @@ void test_list_insert()
 
 void test_list_remove()
 {
-  ioopm_list_t *lst = ioopm_linked_list_create();
+  ioopm_list_t *lst = ioopm_linked_list_create((ioopm_eq_function *) ioopm_equals_int);
 
-  ioopm_linked_list_append(lst, 10);
-  ioopm_linked_list_append(lst, 20);
-  ioopm_linked_list_append(lst, 30);
-  ioopm_linked_list_append(lst, 40);
+  ioopm_linked_list_append(lst, int_elem(10));
+  ioopm_linked_list_append(lst, int_elem(20));
+  ioopm_linked_list_append(lst, int_elem(30));
+  ioopm_linked_list_append(lst, int_elem(40));
 
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2), 30);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2).int_v, 30);
   CU_ASSERT_EQUAL(ioopm_linked_list_size(lst), 4);
 
-  CU_ASSERT_EQUAL(ioopm_linked_list_remove(lst, 2), 30);
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2), 40);
+  CU_ASSERT_EQUAL(ioopm_linked_list_remove(lst, 2).int_v, 30);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2).int_v, 40);
   CU_ASSERT_EQUAL(ioopm_linked_list_size(lst), 3);
 
-  CU_ASSERT_EQUAL(ioopm_linked_list_remove(lst, 0), 10);
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0), 20);
+  CU_ASSERT_EQUAL(ioopm_linked_list_remove(lst, 0).int_v, 10);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0).int_v, 20);
 
   ioopm_linked_list_destroy(lst);
 }
 
 void test_list_get()
 {
-  ioopm_list_t *lst = ioopm_linked_list_create();
+  ioopm_list_t *lst = ioopm_linked_list_create((ioopm_eq_function *) ioopm_equals_int);
 
-  ioopm_linked_list_append(lst, 100);
-  ioopm_linked_list_append(lst, 110);
-  ioopm_linked_list_append(lst, 120);
-  ioopm_linked_list_append(lst, 130);
-  ioopm_linked_list_append(lst, 140);
+  ioopm_linked_list_append(lst, int_elem(100));
+  ioopm_linked_list_append(lst, int_elem(110));
+  ioopm_linked_list_append(lst, int_elem(120));
+  ioopm_linked_list_append(lst, int_elem(130));
+  ioopm_linked_list_append(lst, int_elem(140));
 
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0), 100);
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2), 120);
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 4), 140);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0).int_v, 100);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2).int_v, 120);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 4).int_v, 140);
 
   ioopm_linked_list_destroy(lst);
 }
 
 void test_list_contains()
 {
-  ioopm_list_t *lst = ioopm_linked_list_create();
+  ioopm_list_t *lst = ioopm_linked_list_create((ioopm_eq_function *) ioopm_equals_int);
 
-  ioopm_linked_list_append(lst, 10);
-  ioopm_linked_list_append(lst, 20);
-  ioopm_linked_list_append(lst, 30);
-  ioopm_linked_list_append(lst, 40);
-  CU_ASSERT_TRUE(ioopm_linked_list_contains(lst, 30));
+  ioopm_linked_list_append(lst, int_elem(10));
+  ioopm_linked_list_append(lst, int_elem(20));
+  ioopm_linked_list_append(lst, int_elem(30));
+  ioopm_linked_list_append(lst, int_elem(40));
+  CU_ASSERT_TRUE(ioopm_linked_list_contains(lst, int_elem(30)));
 
   ioopm_linked_list_remove(lst, 2);
-  CU_ASSERT_FALSE(ioopm_linked_list_contains(lst, 30));
+  CU_ASSERT_FALSE(ioopm_linked_list_contains(lst, int_elem(30)));
 
   ioopm_linked_list_destroy(lst);
 }
 
 void test_list_size()
 {
-  ioopm_list_t *lst = ioopm_linked_list_create();
+  ioopm_list_t *lst = ioopm_linked_list_create((ioopm_eq_function *) ioopm_equals_int);
 
-  ioopm_linked_list_append(lst, 25);
-  ioopm_linked_list_append(lst, 25);
-  ioopm_linked_list_append(lst, 25);
-  ioopm_linked_list_append(lst, 25);
+  ioopm_linked_list_append(lst, int_elem(25));
+  ioopm_linked_list_append(lst, int_elem(25));
+  ioopm_linked_list_append(lst, int_elem(25));
+  ioopm_linked_list_append(lst, int_elem(25));
 
   CU_ASSERT_EQUAL(ioopm_linked_list_size(lst), 4);
 
@@ -493,10 +494,10 @@ void test_list_size()
 
 void test_list_empty()
 {
-  ioopm_list_t *lst = ioopm_linked_list_create();
+  ioopm_list_t *lst = ioopm_linked_list_create((ioopm_eq_function *) ioopm_equals_int);
 
   CU_ASSERT_TRUE(ioopm_linked_list_is_empty(lst));
-  ioopm_linked_list_append(lst, 42);
+  ioopm_linked_list_append(lst, int_elem(42));
   CU_ASSERT_FALSE(ioopm_linked_list_is_empty(lst));
 
   ioopm_linked_list_destroy(lst);
@@ -504,63 +505,63 @@ void test_list_empty()
 
 void test_list_clear()
 {
-  ioopm_list_t *lst = ioopm_linked_list_create();
+  ioopm_list_t *lst = ioopm_linked_list_create((ioopm_eq_function *) ioopm_equals_int);
 
-  ioopm_linked_list_append(lst, 1);
-  ioopm_linked_list_append(lst, 2);
-  ioopm_linked_list_append(lst, 3);
-  ioopm_linked_list_append(lst, 4);
+  ioopm_linked_list_append(lst, int_elem(1));
+  ioopm_linked_list_append(lst, int_elem(2));
+  ioopm_linked_list_append(lst, int_elem(3));
+  ioopm_linked_list_append(lst, int_elem(4));
 
   ioopm_linked_list_clear(lst);
   CU_ASSERT_EQUAL(ioopm_linked_list_size(lst), 0);
 
-  ioopm_linked_list_append(lst, 5);
+  ioopm_linked_list_append(lst, int_elem(5));
   CU_ASSERT_EQUAL(ioopm_linked_list_size(lst), 1);
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0), 5);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0).int_v, 5);
 
   ioopm_linked_list_destroy(lst);
 }
 
 // Higher-order function to pred tests.
-static bool simple_int_equality(int index, void *value, void *extra)
+static bool simple_int_equality(int index, elem_t value, void *extra)
 {
-  int *comp_num = (int *)extra;
-  int *val = (int *) value;
-  return *comp_num == *val;
+  elem_t *comp_elem = (elem_t *) extra;
+  return ioopm_equals_int(value, *comp_elem);
 }
 
 void test_list_holds_pred_all()
 {
-  ioopm_list_t *lst = ioopm_linked_list_create();
+  ioopm_list_t *lst = ioopm_linked_list_create((ioopm_eq_function *) ioopm_equals_int);
   int comp_num = 42;
 
-  ioopm_linked_list_append(lst, 42);
-  ioopm_linked_list_append(lst, 42);
-  ioopm_linked_list_append(lst, 42);
-  ioopm_linked_list_append(lst, 42);
-  ioopm_linked_list_append(lst, 42);
-  CU_ASSERT_TRUE(ioopm_linked_list_all(lst, (ioopm_predicate *) simple_int_equality, &comp_num));
+  ioopm_linked_list_append(lst, int_elem(42));
+  ioopm_linked_list_append(lst, int_elem(42));
+  ioopm_linked_list_append(lst, int_elem(42));
+  ioopm_linked_list_append(lst, int_elem(42));
+  ioopm_linked_list_append(lst, int_elem(42));
+  // Compare int gets type cast to elem_t.
+  CU_ASSERT_TRUE(ioopm_linked_list_all(lst, (ioopm_list_predicate *) simple_int_equality, &comp_num));
 
-  ioopm_linked_list_insert(lst, 3, 55); 
-  CU_ASSERT_FALSE(ioopm_linked_list_all(lst, (ioopm_predicate *) simple_int_equality, &comp_num));
+  ioopm_linked_list_insert(lst, 3, int_elem(55)); 
+  CU_ASSERT_FALSE(ioopm_linked_list_all(lst, (ioopm_list_predicate *) simple_int_equality, &comp_num));
 
   ioopm_linked_list_destroy(lst);
 }
 
 void test_list_holds_pred_any()
 {
-  ioopm_list_t *lst = ioopm_linked_list_create();
+  ioopm_list_t *lst = ioopm_linked_list_create((ioopm_eq_function *) ioopm_equals_int);
   int comp_num = 42;
 
-  ioopm_linked_list_append(lst, 1);
-  ioopm_linked_list_append(lst, 2);
-  ioopm_linked_list_append(lst, 3);
-  ioopm_linked_list_append(lst, 4);
-  ioopm_linked_list_append(lst, 5);
-  CU_ASSERT_FALSE(ioopm_linked_list_any(lst, (ioopm_predicate *) simple_int_equality, &comp_num));
+  ioopm_linked_list_append(lst, int_elem(1));
+  ioopm_linked_list_append(lst, int_elem(2));
+  ioopm_linked_list_append(lst, int_elem(3));
+  ioopm_linked_list_append(lst, int_elem(4));
+  ioopm_linked_list_append(lst, int_elem(5));
+  CU_ASSERT_FALSE(ioopm_linked_list_any(lst, (ioopm_list_predicate *) simple_int_equality, &comp_num));
 
-  ioopm_linked_list_insert(lst, 3, 42); 
-  CU_ASSERT_TRUE(ioopm_linked_list_any(lst, (ioopm_predicate *) simple_int_equality, &comp_num));
+  ioopm_linked_list_insert(lst, 3, int_elem(42)); 
+  CU_ASSERT_TRUE(ioopm_linked_list_any(lst, (ioopm_list_predicate *) simple_int_equality, &comp_num));
 
   ioopm_linked_list_destroy(lst);
 }
@@ -574,20 +575,20 @@ static void double_ints(int index, void *value, void *extra)
 
 void test_list_apply_all()
 {
-  ioopm_list_t *lst = ioopm_linked_list_create();
+  ioopm_list_t *lst = ioopm_linked_list_create((ioopm_eq_function *) ioopm_equals_int);
 
-  ioopm_linked_list_append(lst, 1);
-  ioopm_linked_list_append(lst, 2);
-  ioopm_linked_list_append(lst, 3);
-  ioopm_linked_list_append(lst, 4);
-  ioopm_linked_list_append(lst, 5);
+  ioopm_linked_list_append(lst, int_elem(1));
+  ioopm_linked_list_append(lst, int_elem(2));
+  ioopm_linked_list_append(lst, int_elem(3));
+  ioopm_linked_list_append(lst, int_elem(4));
+  ioopm_linked_list_append(lst, int_elem(5));
 
-  ioopm_linked_list_apply_to_all(lst, (ioopm_apply_function *) double_ints, NULL);
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0), 2);
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 1), 4);
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2), 6);
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 3), 8);
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 4), 10);
+  ioopm_linked_list_apply_to_all(lst, (ioopm_apply_list_function *) double_ints, NULL);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 0).int_v, 2);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 1).int_v, 4);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 2).int_v, 6);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 3).int_v, 8);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(lst, 4).int_v, 10);
 
   ioopm_linked_list_destroy(lst);
 }

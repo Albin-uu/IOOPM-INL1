@@ -1,8 +1,10 @@
 #pragma once
+
 #include <stdbool.h>
 // Needed for size_t.
 #include <stdlib.h>
 
+#include "common.h"
 #include "linked_list.h"
 
 /**

@@ -180,7 +180,7 @@ void ioopm_hash_table_clear(ioopm_hash_table_t *ht)
 
 ioopm_list_t *ioopm_hash_table_keys(const ioopm_hash_table_t *ht)
 {
-  ioopm_list_t *key_list = ioopm_linked_list_create();
+  ioopm_list_t *key_list = ioopm_linked_list_create((ioopm_eq_function *) ioopm_equals_int);
 
   const entry_t *buckets = ht->buckets;
   entry_t *current = NULL;
@@ -189,7 +189,7 @@ ioopm_list_t *ioopm_hash_table_keys(const ioopm_hash_table_t *ht)
     current = buckets[i].next;
     while (current != NULL)
     {
-      ioopm_linked_list_append(key_list, current->key);
+      ioopm_linked_list_append(key_list, int_elem(current->key));
       current = current->next;
     }
   }
@@ -264,7 +264,7 @@ bool ioopm_hash_table_all(const ioopm_hash_table_t *ht, ioopm_ht_predicate *pred
   for (int i = 0; i < size && result; ++i)
   {
     // TODO perf with iterator
-    int key = ioopm_linked_list_get(keys, i);
+    int key = ioopm_linked_list_get(keys, i).int_v;
     result = result && pred(key, values[i], arg);
   }
 
@@ -283,7 +283,7 @@ bool ioopm_hash_table_any(const ioopm_hash_table_t *ht, ioopm_ht_predicate *pred
   for (int i = 0; i < size && result == false; ++i)
   {
     // TODO perf with iterator
-    int key = ioopm_linked_list_get(keys, i);
+    int key = ioopm_linked_list_get(keys, i).int_v;
     result = pred(key, values[i], arg);
   }
 
@@ -301,7 +301,7 @@ void ioopm_hash_table_apply_to_all(ioopm_hash_table_t *ht, ioopm_ht_apply_functi
   for (int i = 0; i < size; ++i)
   {
     // TODO perf with iterator
-    int key = ioopm_linked_list_get(keys, i);
+    int key = ioopm_linked_list_get(keys, i).int_v;
     apply_fun(key, &values[i], arg);
   }
 
