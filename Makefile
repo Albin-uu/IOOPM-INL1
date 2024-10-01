@@ -23,14 +23,19 @@ testnovalgrind: testbuild
 # instead just runs the command.
 .PHONY: test testnovalgrind run
 
+
+SRC_OBJECTS = common.o hash_table.o linked_list.o
+
 # Build.
 # TODO include the main file on normal build when it is created
-normalbuild: hash_table.o linked_list.o
+normalbuild: $(SRC_OBJECTS)
 	$(C_COMPILER) $(C_LINK_OPTIONS) $^ -g -o $@
-testbuild: unit_tests.o hash_table.o linked_list.o
+testbuild: unit_tests.o $(SRC_OBJECTS)
 	$(C_COMPILER) $(C_LINK_OPTIONS) $^ -g -o $@ $(CUNIT_LINK) 
 
 # Source files.
+common.o: src/common.c
+	$(C_COMPILER) $(C_OPTIONS) $^ -c
 hash_table.o: src/hash_table.c
 	$(C_COMPILER) $(C_OPTIONS) $^ -c
 linked_list.o: src/linked_list.c
