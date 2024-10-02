@@ -12,16 +12,17 @@
 typedef struct link list_link;
 struct link
 {
-  int value;
+  elem_t value;
   list_link *next;
 };
 
 typedef struct list ioopm_list_t;
 struct list
 {
+  ioopm_eq_function *equals_fn;
   list_link *first;
   list_link *last;
-  int size;
+  size_t size;
 };
 
 static void size_increment(ioopm_list_t *list) { list->size++; }
@@ -29,25 +30,27 @@ static void size_decrement(ioopm_list_t *list) { list->size--; }
 static void size_reset(ioopm_list_t *list) { list->size = 0; }
 
 
-static list_link *first_proper_elem(ioopm_list_t *list)
+static list_link *first_proper_elem(const ioopm_list_t *list)
   { return list->first->next; }
 
-static list_link *last_proper_elem(ioopm_list_t *list)
+static list_link *last_proper_elem(const ioopm_list_t *list)
   { return list->last; }
 
-static list_link *get_sentinel(ioopm_list_t *list)
+static list_link *get_sentinel(const ioopm_list_t *list)
   { return list->first; }
 
 
-static list_link *get_link_before_index(ioopm_list_t *list, int index)
+static list_link *get_link_before_index(const ioopm_list_t *list, int index)
 {
-  int size = ioopm_linked_list_size(list);
+  size_t size = ioopm_linked_list_size(list);
   list_link *current_link = get_sentinel(list);
 
-  // Index for sentinel is -1.
-  for (int i = -1; i < size; i++)
+  // Comparison between int and size_t requires int to be positive.
+  // from_sentinel equals list index + 1.
+  for (int from_sentinel = 0; from_sentinel < size + 1; from_sentinel++)
   {
-    if (i == index - 1)
+    // Starting from sentinel adds + 1.
+    if (from_sentinel == index)
     {
       break;
     }
@@ -78,15 +81,15 @@ typedef struct
   bool result;
   bool set_result_on_success;
   bool set_result_on_failure;
-  ioopm_predicate *pred;
+  ioopm_list_predicate *pred;
   void *extra;
 } pred_struct;
 
-static void matches_pred(int index, void *value, pred_struct *p_struct)
+static void matches_pred(int index, elem_t *value, pred_struct *p_struct)
 {
   bool set_if_success = p_struct->set_result_on_success;
   bool set_if_fail = p_struct->set_result_on_failure;
-  bool pred_successful = p_struct->pred(index, value, p_struct->extra);
+  bool pred_successful = p_struct->pred(index, *value, p_struct->extra);
 
   if (set_if_success && pred_successful)
   {
@@ -98,7 +101,7 @@ static void matches_pred(int index, void *value, pred_struct *p_struct)
   }
 }
 
-static void iter_for_each(ioopm_list_t *list, ioopm_apply_function *arg_func, void *arg_opt)
+static void iter_for_each(ioopm_list_t *list, ioopm_apply_list_function *arg_func, void *arg_opt)
 {
   list_link *current = get_sentinel(list);
   int index = -1;
@@ -108,19 +111,19 @@ static void iter_for_each(ioopm_list_t *list, ioopm_apply_function *arg_func, vo
   {
     current = current->next;
     index++;
-    // & temp until value is generalised
     arg_func(index, &current->value, arg_opt);
   }
 }
 
-ioopm_list_t *ioopm_linked_list_create(void)
+ioopm_list_t *ioopm_linked_list_create(ioopm_eq_function *eq_fn)
 {
   ioopm_list_t *list = calloc(1, sizeof(ioopm_list_t));
   list_link *sentinel = calloc(1, sizeof(list_link));
 
   sentinel->next = NULL;
-  sentinel->value = 0;
+  // Sentinel values should never be checked.
 
+  list->equals_fn = eq_fn;
   list->first = sentinel;
   list->last = sentinel;
   list->size = 0;
@@ -135,7 +138,7 @@ void ioopm_linked_list_destroy(ioopm_list_t *list)
   Free(list);
 }
 
-void ioopm_linked_list_prepend(ioopm_list_t *list, int value)
+void ioopm_linked_list_prepend(ioopm_list_t *list, elem_t value)
 {
   list_link *current_first = first_proper_elem(list);
   list_link *new_link = calloc(1, sizeof(list_link));
@@ -149,7 +152,7 @@ void ioopm_linked_list_prepend(ioopm_list_t *list, int value)
   size_increment(list);
 }
 
-void ioopm_linked_list_append(ioopm_list_t *list, int value)
+void ioopm_linked_list_append(ioopm_list_t *list, elem_t value)
 {
   list_link *current_last = last_proper_elem(list);
   list_link *new_link = calloc(1, sizeof(list_link));
@@ -163,7 +166,7 @@ void ioopm_linked_list_append(ioopm_list_t *list, int value)
   size_increment(list);
 }
 
-void ioopm_linked_list_insert(ioopm_list_t *list, int index, int value)
+void ioopm_linked_list_insert(ioopm_list_t *list, int index, elem_t value)
 {
   // +1 since inserting will count index as after the insertion.
   assert(index >= 0 && index < ioopm_linked_list_size(list) + 1);
@@ -178,7 +181,7 @@ void ioopm_linked_list_insert(ioopm_list_t *list, int index, int value)
   size_increment(list);
 }
 
-int ioopm_linked_list_remove(ioopm_list_t *list, int index)
+elem_t ioopm_linked_list_remove(ioopm_list_t *list, int index)
 {
   assert(index >= 0 && index < ioopm_linked_list_size(list));
 
@@ -190,14 +193,14 @@ int ioopm_linked_list_remove(ioopm_list_t *list, int index)
 
   prev_link->next = to_be_removed->next;
   
-  int value_of_removed = to_be_removed->value;
+  elem_t value_of_removed = to_be_removed->value;
   Free(to_be_removed);
   size_decrement(list);
 
   return value_of_removed;
 }
 
-int ioopm_linked_list_get(ioopm_list_t *list, int index)
+elem_t ioopm_linked_list_get(const ioopm_list_t *list, int index)
 {
   assert(index >= 0 && index < ioopm_linked_list_size(list));
 
@@ -205,37 +208,41 @@ int ioopm_linked_list_get(ioopm_list_t *list, int index)
   return prev_link->next->value;
 }
 
-// TODO figure out general function
-static bool is_equal_int(int index, void *value, void *compare_value)
+// Need to get current equals function from outer scope
+// since we can't change function signature of iter function.
+ioopm_eq_function *temp_equals = NULL;
+
+static bool is_equal_internal(int index, elem_t value, void *compare_value)
 {
-  int *val = (int *) value;
-  int *compare_val = (int *) compare_value;
-  return *val == *compare_val;
+  elem_t *comp_val_ptr = (elem_t *) compare_value;
+  return temp_equals(value, *comp_val_ptr);
 }
 
-bool ioopm_linked_list_contains(ioopm_list_t *list, int element)
+bool ioopm_linked_list_contains(ioopm_list_t *list, elem_t element)
 {
-  // temp &
+  temp_equals = list->equals_fn;
+
   pred_struct p_struct =
   {
-    // TODO int function to general
-    .pred = &is_equal_int,
+    .pred = is_equal_internal,
     .extra = &element,
     .set_result_on_success = true,
     .set_result_on_failure = false,
     .result = false,
   };
 
-  iter_for_each(list, (ioopm_apply_function *) matches_pred, &p_struct);
+  iter_for_each(list, (ioopm_apply_list_function *) matches_pred, &p_struct);
+  temp_equals = NULL;
+
   return p_struct.result;
 }
 
-int ioopm_linked_list_size(ioopm_list_t *list)
+size_t ioopm_linked_list_size(const ioopm_list_t *list)
 {
   return list->size;
 }
 
-bool ioopm_linked_list_is_empty(ioopm_list_t *list)
+bool ioopm_linked_list_is_empty(const ioopm_list_t *list)
 {
   return ioopm_linked_list_size(list) == 0;
 }
@@ -253,7 +260,7 @@ void ioopm_linked_list_clear(ioopm_list_t *list)
   size_reset(list);
 }
 
-bool ioopm_linked_list_all(ioopm_list_t *list, ioopm_predicate *pred, void *extra)
+bool ioopm_linked_list_all(ioopm_list_t *list, ioopm_list_predicate *pred, void *extra)
 {
   pred_struct p_struct = {
     .pred = pred,
@@ -263,12 +270,12 @@ bool ioopm_linked_list_all(ioopm_list_t *list, ioopm_predicate *pred, void *extr
     .extra = extra
   };
 
-  iter_for_each(list, (ioopm_apply_function *) matches_pred, &p_struct);
+  iter_for_each(list, (ioopm_apply_list_function *) matches_pred, &p_struct);
 
   return p_struct.result;
 }
 
-bool ioopm_linked_list_any(ioopm_list_t *list, ioopm_predicate *pred, void *extra)
+bool ioopm_linked_list_any(ioopm_list_t *list, ioopm_list_predicate *pred, void *extra)
 {
   pred_struct p_struct = {
     .pred = pred,
@@ -278,12 +285,12 @@ bool ioopm_linked_list_any(ioopm_list_t *list, ioopm_predicate *pred, void *extr
     .extra = extra
   };
 
-  iter_for_each(list, (ioopm_apply_function *) matches_pred, &p_struct);
+  iter_for_each(list, (ioopm_apply_list_function *) matches_pred, &p_struct);
 
   return p_struct.result;
 }
 
-void ioopm_linked_list_apply_to_all(ioopm_list_t *list, ioopm_apply_function *fun, void *extra)
+void ioopm_linked_list_apply_to_all(ioopm_list_t *list, ioopm_apply_list_function *fun, void *extra)
 {
-  iter_for_each(list, (ioopm_apply_function *) fun, extra);
+  iter_for_each(list, (ioopm_apply_list_function *) fun, extra);
 }

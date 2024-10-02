@@ -6,27 +6,48 @@
 #include <assert.h>
 
 #include "hash_table.h"
+#include "linked_list.h"
 
-#define HASH_TABLE_ARRAY_SIZE ((int)17)
+#define HASH_TABLE_ARRAY_SIZE ((size_t)17)
 
 typedef struct entry entry_t;
 
 struct entry
 {
-  int key;       // holds the key
-  char *value;   // holds the value
+  elem_t key;       // holds the key
+  elem_t value;   // holds the value
   entry_t *next; // points to the next entry (possibly NULL)
 };
 
 struct hash_table
 {
+  ioopm_eq_function *value_eq_fn;
+  ioopm_eq_function *key_eq_fn;
+  ioopm_hash_function *hash_fn;
   entry_t buckets[HASH_TABLE_ARRAY_SIZE];
-  int size;
+  size_t size;
 };
 
-ioopm_hash_table_t *ioopm_hash_table_create(void)
+// Helper as default int hash function.
+static int extract_int_hash_key(elem_t key)
+{ return key.int_v; }
+
+ioopm_hash_table_t *ioopm_hash_table_create(
+  ioopm_eq_function *value_eq_fn,
+  ioopm_eq_function *key_eq_fn,
+  ioopm_hash_function *hash_fn)
 {
+  // If arguments are omited assume all keys and values will be int's.
+  if (value_eq_fn == NULL) { value_eq_fn = ioopm_equals_int; }
+  if (key_eq_fn == NULL) { key_eq_fn = ioopm_equals_int; }
+  // If hash function is omitted, then keys will be ints and the raw key
+  // will serve as the hashed value.
+  if (hash_fn == NULL) { hash_fn = extract_int_hash_key; }
+
   ioopm_hash_table_t *ht = calloc(1, sizeof(ioopm_hash_table_t));
+  ht->value_eq_fn = value_eq_fn;
+  ht->key_eq_fn = key_eq_fn;
+  ht->hash_fn = hash_fn;
   ht->size = 0;
   return ht;
 }
@@ -39,11 +60,10 @@ static void entry_destroy(entry_t * entry_ptr)
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht)
 {
   ioopm_hash_table_clear(ht);
-
   free(ht);
 }
 
-static entry_t *entry_create(int key, char *value, entry_t *next)
+static entry_t *entry_create(elem_t key, elem_t value, entry_t *next)
 {
   entry_t *new_entry = calloc(1, sizeof(entry_t));
 
@@ -54,12 +74,12 @@ static entry_t *entry_create(int key, char *value, entry_t *next)
   return new_entry;
 }
 
-static entry_t *find_previous_entry_for_key(entry_t *bucket, int key)
+static entry_t *find_previous_entry_for_key(ioopm_hash_table_t *ht, entry_t *bucket, elem_t key)
 {
   entry_t *last_checked = bucket;
   while (last_checked->next != NULL)
   {
-    if (last_checked->next->key >= key)
+    if (ht->key_eq_fn(last_checked->next->key, key))
     {
       break;
     }
@@ -69,18 +89,16 @@ static entry_t *find_previous_entry_for_key(entry_t *bucket, int key)
   return last_checked;
 }
 
-void ioopm_hash_table_insert(ioopm_hash_table_t *ht, int key, char *value)
+void ioopm_hash_table_insert(ioopm_hash_table_t *ht, elem_t key, elem_t value)
 {
-  // Make sure key is not negative.
-  assert(key >= 0);
+  int hashed_key = ht->hash_fn(key);
+  int bucket = hashed_key % HASH_TABLE_ARRAY_SIZE;
 
-  int bucket = key % HASH_TABLE_ARRAY_SIZE;
-
-  entry_t *entry = find_previous_entry_for_key(&ht->buckets[bucket], key);
+  entry_t *entry = find_previous_entry_for_key(ht, &ht->buckets[bucket], key);
   entry_t *next = entry->next;
 
   /// Check if the next entry should be updated or not
-  if (next != NULL && next->key == key)
+  if (next != NULL && ht->key_eq_fn(next->key, key))
     {
       next->value = value;
     }
@@ -91,15 +109,11 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, int key, char *value)
     }
 }
 
-bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, int key, char **result)
+bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, elem_t key, elem_t *result)
 {
-  if (key < 0)
-  {
-    return false;
-  }
-
-  int ht_index = key % HASH_TABLE_ARRAY_SIZE;
-  entry_t *prev_entry_ptr = find_previous_entry_for_key(&ht->buckets[ht_index], key);
+  int hashed_key = ht->hash_fn(key);
+  int ht_index = hashed_key % HASH_TABLE_ARRAY_SIZE;
+  entry_t *prev_entry_ptr = find_previous_entry_for_key(ht, &ht->buckets[ht_index], key);
 
   if (prev_entry_ptr->next == NULL)
   {
@@ -112,10 +126,11 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, int key, char **result)
   }
 }
 
-bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, int key)
+bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t key, elem_t *send_back)
 {
-  int bucket = key % HASH_TABLE_ARRAY_SIZE;
-  entry_t *prev_entry_ptr = find_previous_entry_for_key(&ht->buckets[bucket], key);
+  int hashed_key = ht->hash_fn(key);
+  int bucket = hashed_key % HASH_TABLE_ARRAY_SIZE;
+  entry_t *prev_entry_ptr = find_previous_entry_for_key(ht, &ht->buckets[bucket], key);
   entry_t *to_be_removed = prev_entry_ptr->next;
 
   if (to_be_removed == NULL)
@@ -126,6 +141,8 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, int key)
   {
     entry_t *final_next = to_be_removed->next;
     prev_entry_ptr->next = final_next;
+
+    if (send_back != NULL) { *send_back = to_be_removed->value; }
     free(to_be_removed);
 
     ht->size -= 1;
@@ -133,12 +150,12 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, int key)
   }
 }
 
-int ioopm_hash_table_size(ioopm_hash_table_t *ht)
+size_t ioopm_hash_table_size(const ioopm_hash_table_t *ht)
 {
   return ht->size;
 }
 
-bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht)
+bool ioopm_hash_table_is_empty(const ioopm_hash_table_t *ht)
 {
   return ioopm_hash_table_size(ht) == 0;
 }
@@ -178,43 +195,37 @@ void ioopm_hash_table_clear(ioopm_hash_table_t *ht)
   ht->size = 0;
 }
 
-int *ioopm_hash_table_keys(ioopm_hash_table_t *ht)
+ioopm_list_t *ioopm_hash_table_keys(const ioopm_hash_table_t *ht)
 {
-  int *keys = calloc(ht->size, sizeof(int));
-  int key_counter = 0;
+  ioopm_list_t *key_list = ioopm_linked_list_create((ioopm_eq_function *) ioopm_equals_int);
 
-  entry_t *buckets = ht->buckets;
+  const entry_t *buckets = ht->buckets;
   entry_t *current = NULL;
   for (int i = 0; i < HASH_TABLE_ARRAY_SIZE; i++)
   {
     current = buckets[i].next;
     while (current != NULL)
     {
-      keys[key_counter] = current->key;
-      key_counter++;
-
+      ioopm_linked_list_append(key_list, current->key);
       current = current->next;
     }
   }
 
-  return keys;
+  return key_list;
 }
 
-char **ioopm_hash_table_values(ioopm_hash_table_t *ht)
+ioopm_list_t *ioopm_hash_table_values(const ioopm_hash_table_t *ht)
 {
-  char **values = calloc(ioopm_hash_table_size(ht), sizeof(char *));
-  int value_counter = 0;
+  ioopm_list_t *values = ioopm_linked_list_create(ht->value_eq_fn);
 
-  entry_t *buckets = ht->buckets;
+  const entry_t *buckets = ht->buckets;
   entry_t *current = NULL;
   for (int i = 0; i < HASH_TABLE_ARRAY_SIZE; i++)
   {
     current = buckets[i].next;
     while (current != NULL)
     {
-      values[value_counter] = current->value;
-      value_counter++;
-
+      ioopm_linked_list_append(values, current->value);
       current = current->next;
     }
   }
@@ -231,76 +242,88 @@ char **ioopm_hash_table_values(ioopm_hash_table_t *ht)
 
 // Using ioopm_hash_table_any here would massively
 // degrade performance at minimal benefit.
-bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, int key)
+bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, elem_t key)
 {
-  char *temp = NULL;
+  elem_t temp;
   return ioopm_hash_table_lookup(ht, key, &temp);
 }
 
+// TODO REVISE PERF NOTE
 // Using ioopm_hash_table_any here would
 // degrade performance at a small benefit and add coupling.
-bool ioopm_hash_table_has_value(ioopm_hash_table_t *ht, char *value)
+bool ioopm_hash_table_has_value(ioopm_hash_table_t *ht, const elem_t value)
 {
-  char **ht_values = ioopm_hash_table_values(ht);
+  ioopm_list_t *ht_values = ioopm_hash_table_values(ht);
+  size_t size = ioopm_linked_list_size(ht_values);
 
-  for (int i = 0; i < ht->size; i++)
+  for (int i = 0; i < size; i++)
   {
-    // strcmp has weird return values, 0 means equal.
-    if (strcmp(ht_values[i], value) == 0)
+    // TODO PERF
+    elem_t ht_val = ioopm_linked_list_get(ht_values, i);
+    if (ht->value_eq_fn(ht_val, value))
     {
-      free(ht_values);
+      ioopm_linked_list_destroy(ht_values);
       return true;
     }
   }
 
-  free(ht_values);
+  ioopm_linked_list_destroy(ht_values);
   return false;
 }
 
-bool ioopm_hash_table_all(ioopm_hash_table_t *ht, ioopm_ht_predicate *pred, void *arg)
+bool ioopm_hash_table_all(const ioopm_hash_table_t *ht, ioopm_predicate *pred, void *arg)
 {
-  int size = ioopm_hash_table_size(ht);
-  int *keys = ioopm_hash_table_keys(ht);
-  char **values = ioopm_hash_table_values(ht);
+  size_t size = ioopm_hash_table_size(ht);
+  ioopm_list_t *keys = ioopm_hash_table_keys(ht);
+  ioopm_list_t *values = ioopm_hash_table_values(ht);
   bool result = true;
   for (int i = 0; i < size && result; ++i)
   {
-    result = result && pred(keys[i], values[i], arg);
+    // TODO perf with iterator
+    elem_t key = ioopm_linked_list_get(keys, i);
+    elem_t val = ioopm_linked_list_get(values, i);
+    result = result && pred(key, val, arg);
   }
 
-  free(keys);
-  free(values);
+  ioopm_linked_list_destroy(keys);
+  ioopm_linked_list_destroy(values);
 
   return result;
 }
 
-bool ioopm_hash_table_any(ioopm_hash_table_t *ht, ioopm_ht_predicate *pred, void *arg)
+bool ioopm_hash_table_any(const ioopm_hash_table_t *ht, ioopm_predicate *pred, void *arg)
 {
-  int size = ioopm_hash_table_size(ht);
-  int *keys = ioopm_hash_table_keys(ht);
-  char **values = ioopm_hash_table_values(ht);
+  size_t size = ioopm_hash_table_size(ht);
+  ioopm_list_t *keys = ioopm_hash_table_keys(ht);
+  ioopm_list_t *values = ioopm_hash_table_values(ht);
   bool result = false;
   for (int i = 0; i < size && result == false; ++i)
   {
-    result = pred(keys[i], values[i], arg);
+    // TODO perf with iterator
+    elem_t key = ioopm_linked_list_get(keys, i);
+    elem_t val = ioopm_linked_list_get(values, i);
+    result = pred(key, val, arg);
   }
 
-  free(keys);
-  free(values);
+  ioopm_linked_list_destroy(keys);
+  ioopm_linked_list_destroy(values);
 
   return result;
 }
 
-void ioopm_hash_table_apply_to_all(ioopm_hash_table_t *ht, ioopm_ht_apply_function *apply_fun, void *arg)
+void ioopm_hash_table_apply_to_all(ioopm_hash_table_t *ht, ioopm_apply_function *apply_fun, void *arg)
 {
-  int size = ioopm_hash_table_size(ht);
-  int *keys = ioopm_hash_table_keys(ht);
-  char **values = ioopm_hash_table_values(ht);
+  size_t size = ioopm_hash_table_size(ht);
+  ioopm_list_t *keys = ioopm_hash_table_keys(ht);
+  ioopm_list_t *values = ioopm_hash_table_values(ht);
   for (int i = 0; i < size; ++i)
   {
-    apply_fun(keys[i], &values[i], arg);
+    // TODO perf with iterator
+    elem_t key = ioopm_linked_list_get(keys, i);
+    elem_t val = ioopm_linked_list_get(values, i);
+    apply_fun(key, &val, arg);
   }
 
-  free(keys);
-  free(values);
+  ioopm_linked_list_destroy(keys);
+  ioopm_linked_list_destroy(values);
 }
