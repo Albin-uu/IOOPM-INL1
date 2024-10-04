@@ -44,6 +44,7 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, elem_t key, elem_t value);
 
 /// @brief lookup value for key in hash table ht
 /// @brief return value need to be checked before accessing result.
+/// @brief result param may be NULL if only the existence of a value from key should be checked.
 /// @param ht hash table operated upon
 /// @param key key to lookup
 /// @param result pointer to elem_t that will contain looked up value on success

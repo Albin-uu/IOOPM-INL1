@@ -121,7 +121,8 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, elem_t key, elem_t *result)
   }
   else
   {
-    *result = prev_entry_ptr->next->value;
+    // Result pointer is optional to allow checking only if a value exists with key.
+    if (result != NULL) { *result = prev_entry_ptr->next->value; }
     return true;
   }
 }
