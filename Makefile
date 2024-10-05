@@ -5,35 +5,40 @@ main: run
 
 # Aliases.
 C_COMPILER     = gcc
-C_OPTIONS      = -Wall -pedantic -g
+C_OPTIONS      = -Wall -pedantic -g -fprofile-arcs -ftest-coverage
 C_LINK_OPTIONS = -lm 
 CUNIT_LINK     = -lcunit
+GCOV           = -lgcov --coverage
+
+SRC_OBJECTS = common.o hash_table.o linked_list.o
 
 # Compile and run immediately.
 run: normalbuild
-	@./normalbuild
+	@valgrind --leak-check=full ./normalbuild test_text.txt
+#	@gcov freq_count.o $(SRC_OBJECTS)
 
 test: testbuild
 	@valgrind --leak-check=full ./testbuild 
+	@gcov unit_tests.o $(SRC_OBJECTS)
 
-testnovalgrind: testbuild
+simpletest: testbuild
 	@./testbuild
 
 # Make will avoid trying to search for files with the same name,
 # instead just runs the command.
-.PHONY: test testnovalgrind run
+.PHONY: test simpletest run
 
-
-SRC_OBJECTS = common.o hash_table.o linked_list.o
 
 # Build.
-# TODO include the main file on normal build when it is created
-normalbuild: $(SRC_OBJECTS)
-	$(C_COMPILER) $(C_LINK_OPTIONS) $^ -g -o $@
+normalbuild: freq_count.o $(SRC_OBJECTS)
+	$(C_COMPILER) $(C_LINK_OPTIONS) $^ -g -o $@ $(GCOV)
 testbuild: unit_tests.o $(SRC_OBJECTS)
-	$(C_COMPILER) $(C_LINK_OPTIONS) $^ -g -o $@ $(CUNIT_LINK) 
+	$(C_COMPILER) $(C_LINK_OPTIONS) $^ -g -o $@ $(CUNIT_LINK) $(GCOV)
 
 # Source files.
+freq_count.o: src/freq_count.c
+	$(C_COMPILER) $(C_OPTIONS) $^ -c
+
 common.o: src/common.c
 	$(C_COMPILER) $(C_OPTIONS) $^ -c
 hash_table.o: src/hash_table.c
@@ -47,5 +52,5 @@ unit_tests.o: test/unit_tests.c
 
 # Remove temp build files.
 clean:
-	@rm -f *.o testbuild normalbuild a.out
+	@rm -f *.o testbuild normalbuild a.out *.gcda *.gcno *.gcov
 	@echo "Cleaned files"

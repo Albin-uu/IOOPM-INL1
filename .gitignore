@@ -1,8 +1,9 @@
-gdb-test.c
-
 testbuild
 normalbuild
 
+*.gcda
+*.gcno
+*.gcov
 
 *.vscode
 
