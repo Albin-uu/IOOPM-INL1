@@ -14,7 +14,8 @@ SRC_OBJECTS = common.o hash_table.o linked_list.o
 
 # Compile and run immediately.
 run: normalbuild
-	@./normalbuild
+	@valgrind --leak-check=full ./normalbuild test_text.txt
+#	@gcov freq_count.o $(SRC_OBJECTS)
 
 test: testbuild
 	@valgrind --leak-check=full ./testbuild 
@@ -29,13 +30,15 @@ simpletest: testbuild
 
 
 # Build.
-# TODO include the main file on normal build when it is created
-normalbuild: $(SRC_OBJECTS)
-	$(C_COMPILER) $(C_LINK_OPTIONS) $^ -g -o $@
+normalbuild: freq_count.o $(SRC_OBJECTS)
+	$(C_COMPILER) $(C_LINK_OPTIONS) $^ -g -o $@ $(GCOV)
 testbuild: unit_tests.o $(SRC_OBJECTS)
 	$(C_COMPILER) $(C_LINK_OPTIONS) $^ -g -o $@ $(CUNIT_LINK) $(GCOV)
 
 # Source files.
+freq_count.o: src/freq_count.c
+	$(C_COMPILER) $(C_OPTIONS) $^ -c
+
 common.o: src/common.c
 	$(C_COMPILER) $(C_OPTIONS) $^ -c
 hash_table.o: src/hash_table.c
