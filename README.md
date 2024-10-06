@@ -10,6 +10,35 @@ Uses a custom commit convention by Albin:
 https://github.com/AshenCinders/CustomCommitConvention
 
 
+# General Info
+
+Build the program with `make normalbuild` and subsequently run it with `./normalbuild FILE_PATH_HERE`.
+
+Build and run test with a single command `make test`.
+This also shows memory usage and leaks with valgrind, and code coverage with gcov.
+
+Clean all build- and coverage files with `make clean`
+
+More options can be found by looking at the `Makefile`.
+
+## Code coverage of testbuild
+
+Using gcov
+
+`common.c`: 100% coverage
+
+`hash_table.c`: 100% coverage
+
+`linked_list.c`: 100% coverage
+
+Checking that all tests are ran:
+`unit_tests.c`: 98.77% coverage
+(error handling CUnit boilerplate)
+
+Note that the code in `freq_count.c` cannot be tested with CUnit as it contains a main file.
+Only `add_or_increment` is tested here (using a basic assert).
+
+
 # Documentation
 
 Some shared data-formats and macros can be found in common.h
