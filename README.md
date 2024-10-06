@@ -10,6 +10,40 @@ Uses a custom commit convention by Albin:
 https://github.com/AshenCinders/CustomCommitConvention
 
 
+# Documentation
+
+Some shared data-formats and macros can be found in common.h
+
+## Hash table documentation
+
+A ioopm_hash_table_t can be created with ioopm_hash_table_create, and must be ioopm_hash_table_destroy'd after use.
+
+Each entry is an elem_t.
+If the value type is elem.ptr_v then the user owns whatever data it points to. The same goes for keys.
+Other elem_t subtypes gets deleted on destruction.
+
+A hash table has a static bucket count of 257, so the performance will slowly degrade if large number of elements are inserted.
+
+Keys are constant and can only be read.
+
+Functions that can fail will return true on success and false on failure. If more data needs to be returned it is done via an argument-pointer.
+
+Information on function-specific usage can be found in hash_table.h.
+
+## Linked list documentation
+
+A ioopm_list_t can be created with ioopm_linked_list_create, and must be ioopm_linked_list_destroy'd after use.
+
+Each entry is an elem_t.
+If the value type is elem.ptr_v then the user owns whatever data it points to.
+
+Functions that can fail will return true on success and false on failure. If more data needs to be returned it is done via an argument-pointer.
+
+ioopm_linked_list_prepend, ioopm_linked_list_append, and ioopm_linked_list_size run in constant order-of-growth.
+
+Information on function-specific usage can be found in linked_list.h.
+
+
 # Initial Profiling Results
 
 Using gprof
