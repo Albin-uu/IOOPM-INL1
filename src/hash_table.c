@@ -8,7 +8,7 @@
 #include "hash_table.h"
 #include "linked_list.h"
 
-#define HASH_TABLE_ARRAY_SIZE ((size_t)17)
+#define HASH_TABLE_ARRAY_SIZE ((size_t)257)
 
 typedef struct entry entry_t;
 
@@ -249,7 +249,6 @@ bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, elem_t key)
   return ioopm_hash_table_lookup(ht, key, &temp);
 }
 
-// TODO REVISE PERF NOTE
 // Using ioopm_hash_table_any here would
 // degrade performance at a small benefit and add coupling.
 bool ioopm_hash_table_has_value(ioopm_hash_table_t *ht, const elem_t value)
@@ -259,7 +258,7 @@ bool ioopm_hash_table_has_value(ioopm_hash_table_t *ht, const elem_t value)
 
   for (int i = 0; i < size; i++)
   {
-    // TODO PERF
+    // Perf can be improved with iterator
     elem_t ht_val = ioopm_linked_list_get(ht_values, i);
     if (ht->value_eq_fn(ht_val, value))
     {
@@ -280,7 +279,7 @@ bool ioopm_hash_table_all(const ioopm_hash_table_t *ht, ioopm_predicate *pred, v
   bool result = true;
   for (int i = 0; i < size && result; ++i)
   {
-    // TODO perf with iterator
+    // Perf can be improved with iterator
     elem_t key = ioopm_linked_list_get(keys, i);
     elem_t val = ioopm_linked_list_get(values, i);
     result = result && pred(key, val, arg);
@@ -300,7 +299,7 @@ bool ioopm_hash_table_any(const ioopm_hash_table_t *ht, ioopm_predicate *pred, v
   bool result = false;
   for (int i = 0; i < size && result == false; ++i)
   {
-    // TODO perf with iterator
+    // Perf can be improved with iterator
     elem_t key = ioopm_linked_list_get(keys, i);
     elem_t val = ioopm_linked_list_get(values, i);
     result = pred(key, val, arg);
@@ -319,7 +318,7 @@ void ioopm_hash_table_apply_to_all(ioopm_hash_table_t *ht, ioopm_apply_function 
   ioopm_list_t *values = ioopm_hash_table_values(ht);
   for (int i = 0; i < size; ++i)
   {
-    // TODO perf with iterator
+    // Perf can be improved with iterator
     elem_t key = ioopm_linked_list_get(keys, i);
     elem_t val = ioopm_linked_list_get(values, i);
     apply_fun(key, &val, arg);
