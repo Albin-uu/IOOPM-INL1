@@ -41,15 +41,15 @@ Only `add_or_increment` is tested here (using a basic assert).
 
 # Documentation
 
-Some shared data-formats and macros can be found in common.h
+Some shared data-formats and macros can be found in `common.h`.
 
 ## Hash table documentation
 
-A ioopm_hash_table_t can be created with ioopm_hash_table_create, and must be ioopm_hash_table_destroy'd after use.
+A `ioopm_hash_table_t` can be created with `ioopm_hash_table_create`, and must be `ioopm_hash_table_destroy`'d after use.
 
-Each entry is an elem_t.
-If the value type is elem.ptr_v then the user owns whatever data it points to. The same goes for keys.
-Other elem_t subtypes gets deleted on destruction.
+Each entry is an `elem_t`.
+If the value type is `elem.ptr_v` then the user owns whatever data it points to. The same goes for keys.
+Other `elem_t` subtypes gets deleted on destruction.
 
 A hash table has a static bucket count of 257, so the performance will slowly degrade if large number of elements are inserted.
 
@@ -57,37 +57,37 @@ Keys are constant and can only be read.
 
 Functions that can fail will return true on success and false on failure. If more data needs to be returned it is done via an argument-pointer.
 
-Information on function-specific usage can be found in hash_table.h.
+Information on function-specific usage can be found in `hash_table.h`.
 
 ## Linked list documentation
 
-A ioopm_list_t can be created with ioopm_linked_list_create, and must be ioopm_linked_list_destroy'd after use.
+A `ioopm_list_t` can be created with `ioopm_linked_list_create`, and must be `ioopm_linked_list_destroy`'d after use.
 
-Each entry is an elem_t.
-If the value type is elem.ptr_v then the user owns whatever data it points to.
+Each entry is an `elem_t`.
+If the value type is `elem.ptr_v` then the user owns whatever data it points to.
 
 Functions that can fail will return true on success and false on failure. If more data needs to be returned it is done via an argument-pointer.
 
-ioopm_linked_list_prepend, ioopm_linked_list_append, and ioopm_linked_list_size run in constant order-of-growth.
+`ioopm_linked_list_prepend`, `ioopm_linked_list_append`, and `ioopm_linked_list_size` run in constant order-of-growth.
 
-Information on function-specific usage can be found in linked_list.h.
+Information on function-specific usage can be found in `linked_list.h`.
 
 
 # Initial Profiling Results
 
 Using gprof
 
-**Running 1k-long-words.txt**:
+`Running 1k-long-words.txt`:
 
 Negligible time spent on all parts of the program.
 Total time: 0.01s
 
-**Running 10k-words.txt**:
+`Running 10k-words.txt`:
 
 Negligible time spent on all parts of the program.
 Total time: 0.01s
 
-**Running 16k-words.txt**:
+`Running 16k-words.txt`:
 
 Total time: 0.12s
 
@@ -120,53 +120,53 @@ This means we use the hash function more effectively and lessen the time spent b
 (And adhering more to the point of using hash tables. That is, fast lookups.)
 
 
-**Performance after changing number of buckets from 17 to 257**:
+## Performance after changing number of buckets from 17 to 257:
 
 (using a prime number lowers chance of potential hashing patterns, making the spread of elements in the buckets more even).
 
-Running 1k-long-words.txt:
+`Running 1k-long-words.txt`:
 
 Negligent time, same as before.
 
-Running 10k-words.txt:
+`Running 10k-words.txt`:
 
 Negligent time, same as before.
 
-Running 16k-words.txt
+`Running 16k-words.txt`:
 
 Total time: 0.08s
 Yielding roughly a 50% performance increase.
 
-~ca 95% of time spent in get_link_before_index
+~ca 95% of time spent in `get_link_before_index`
 
-    It is reasonable to assume the vast majority of time is spent on the temporary list-to-array conversion code.
+    It is reasonable to assume the vast majority of time is spent
+    on the temporary list-to-array conversion code.
 
-**Memory consumption before attempted performace improvements**:
+## Memory consumption before attempted performace improvements:
 
 Using valgrind
 
-1k-long-words.txt
+`1k-long-words.txt`
 ~ca 75 000 bytes allocated
 
-10k-words.txt
+`10k-words.txt`
 ~ca 93 000 bytes allocated
 
-
-16k-words.txt
+`16k-words.txt`
 ~ca 470 000 bytes allocated
 
 
-**Memory consumption after attempted performance improvements**:
+## Memory consumption after attempted performance improvements:
 
 Using valgrind
 
-1k-long-words.txt
+`1k-long-words.txt`
 ~ca 86 000 bytes allocated
 
-10k-words.txt
+`10k-words.txt`
 ~ca 104 000 bytes allocated
 
-16k-words.txt
+`16k-words.txt`
 ~ca 485 000 bytes allocated
 
 
