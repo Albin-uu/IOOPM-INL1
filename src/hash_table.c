@@ -8,7 +8,7 @@
 #include "hash_table.h"
 #include "linked_list.h"
 
-#define HASH_TABLE_ARRAY_SIZE ((size_t)17)
+#define HASH_TABLE_ARRAY_SIZE ((size_t)257)
 
 typedef struct entry entry_t;
 
